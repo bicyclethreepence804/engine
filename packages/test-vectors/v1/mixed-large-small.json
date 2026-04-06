@@ -1,0 +1,32 @@
+{
+  "name": "mixed-large-small",
+  "description": "Mixed large and small profits to stress floating-to-decimal normalization.",
+  "input": {
+    "trades": [
+      {
+        "profit": 1000.0004
+      },
+      {
+        "profit": -999.9996
+      },
+      {
+        "profit": 0.12345
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 3
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": 0.124,
+      "avgTradeProfit": 0.041
+    },
+    "metadata": {
+      "inputHash": "2f83c14f43503cb2e7a5870236343c3c774511e77dcbf55c8fe531d7ac7e8690",
+      "configHash": "9042bb709f6cd307555b70ebab18a2c7ba64e9daf59abaccb3a15fb7769f02d2"
+    }
+  }
+}

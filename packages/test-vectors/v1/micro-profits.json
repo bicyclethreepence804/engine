@@ -1,0 +1,30 @@
+{
+  "name": "micro-profits",
+  "description": "Very small trade profits; DECIMALS rounding may net to zero.",
+  "input": {
+    "strategyId": "micro",
+    "trades": [
+      {
+        "profit": 1e-10
+      },
+      {
+        "profit": -2e-10
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 2,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "6e09499fecb315c89b5731a1d33c3eb577adbdf6451054a2cb5fd9588a55b27a",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

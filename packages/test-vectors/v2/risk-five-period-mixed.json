@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "five-period-mixed",
+  "description": "Synthetic OOS returns; golden subset of riskBuilderFromRCore output.",
+  "input": {
+    "R": [
+      0.01,
+      -0.02,
+      0.015,
+      -0.01,
+      0.02
+    ],
+    "options": {
+      "oosWindowCount": 5
+    }
+  },
+  "expected": {
+    "approx": {
+      "sharpeRatio": 0.1746667529218746,
+      "maxDrawdown": -0.02,
+      "var": -0.018,
+      "expectedShortfall95": -0.02,
+      "gainToPain": 0.5
+    },
+    "approxDigits": 5,
+    "exact": {
+      "metrics": {
+        "profitFactor": 1.5,
+        "winRate": 0.6
+      },
+      "oosWindowCount": 5,
+      "totalTrades": 5,
+      "analysis_engine_version": "3.0"
+    },
+    "metadata": {
+      "fixtureHash": "7d8e1e9d046edfab5b7b1c6ace88412aee6a19350e622fd2cfafa8b87c4c7eb8"
+    }
+  }
+}

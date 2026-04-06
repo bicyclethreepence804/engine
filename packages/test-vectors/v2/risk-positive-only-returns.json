@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "positive-only-returns",
+  "description": "All OOS returns positive: validates finite upside metrics subset.",
+  "input": {
+    "R": [
+      0.01,
+      0.02,
+      0.03,
+      0.015,
+      0.005
+    ],
+    "options": {
+      "oosWindowCount": 5
+    }
+  },
+  "expected": {
+    "approx": {
+      "sharpeRatio": 1.6636007837121163,
+      "maxDrawdown": 0,
+      "gainToPain": 100,
+      "edgeStabilityZScore": 3.719924439802217,
+      "skewness": 0.11802573127687307,
+      "kurtosis": -0.02191380569759538
+    },
+    "approxDigits": 5,
+    "metadata": {
+      "fixtureHash": "184cfee15c6108de2b96ad33599e8aef91f3d76ac058bdeb550d105acda4c149"
+    }
+  }
+}

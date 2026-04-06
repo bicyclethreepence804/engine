@@ -1,0 +1,32 @@
+{
+  "name": "zero-profits-trades",
+  "description": "Zero-profit trades: verifies averages with explicit zero pnl.",
+  "input": {
+    "trades": [
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "66c177adb480da07a1d528e9f49d79c0908eb2dcc24208b2d7a7b2373a4a2e3a",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

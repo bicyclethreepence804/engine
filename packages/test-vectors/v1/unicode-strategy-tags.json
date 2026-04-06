@@ -1,0 +1,35 @@
+{
+  "name": "unicode-strategy-tags",
+  "description": "Unicode in strategyId and tags; stable hashing and summary.",
+  "input": {
+    "strategyId": "demo-Ρ-universe",
+    "tags": [
+      "alpha",
+      "beta",
+      "☃"
+    ],
+    "trades": [
+      {
+        "profit": 1
+      },
+      {
+        "profit": -0.5
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 2,
+      "netProfit": 0.5,
+      "avgTradeProfit": 0.25
+    },
+    "metadata": {
+      "inputHash": "5e040660dc315b92034768aea5b3d8c57404aea2c61015beea3ae866c69c58a2",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

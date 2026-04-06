@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "totalTrades": 3,
+    "netProfit": 0.11,
+    "avgTradeProfit": 0.03666667
+  },
+  "metadata": {
+    "engineVersion": "0.1.0",
+    "formulaVersion": "2.2.0",
+    "riskAnalysisVersion": 1,
+    "contractVersion": "1.0.0",
+    "inputHash": "b414efa82f2a1cee5d3eb02caa352ffb5632a3c51986d62b5c97c3301bc84e6d",
+    "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384",
+    "seed": 42,
+    "decimals": 8
+  }
+}

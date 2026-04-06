@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "three-period-line",
+  "description": "Three OOS returns; mixed win/loss; stable subset for regression.",
+  "input": {
+    "R": [
+      0.02,
+      -0.02,
+      0.01
+    ],
+    "options": {
+      "oosWindowCount": 3
+    }
+  },
+  "expected": {
+    "approx": {
+      "sharpeRatio": 0.16012815380508716,
+      "maxDrawdown": -0.019999999999999973,
+      "var": -0.016999999999999998,
+      "expectedShortfall95": -0.019999999999999973,
+      "gainToPain": 0.4999999999999999
+    },
+    "approxDigits": 5,
+    "exact": {
+      "metrics": {
+        "profitFactor": 1.5,
+        "winRate": 0.6666666666666666
+      },
+      "oosWindowCount": 3,
+      "totalTrades": 3,
+      "analysis_engine_version": "3.0"
+    },
+    "metadata": {
+      "fixtureHash": "07e32b410758583e23b43c075fa4a4a106e44595b121620d73047d2af1545907"
+    }
+  }
+}

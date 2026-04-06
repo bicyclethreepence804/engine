@@ -1,0 +1,32 @@
+{
+  "name": "all-negative-net",
+  "input": {
+    "strategyId": "demo-loss",
+    "trades": [
+      {
+        "profit": -10
+      },
+      {
+        "profit": -20
+      },
+      {
+        "profit": -5
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": -35,
+      "avgTradeProfit": -11.66666667
+    },
+    "metadata": {
+      "inputHash": "74f269efcbbbaacd4690ce4c8113d4747c4c1c3e3cee6540fee2fdd667f5c97f",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

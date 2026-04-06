@@ -1,0 +1,29 @@
+{
+  "name": "high-precision-profits",
+  "input": {
+    "strategyId": "demo-precision",
+    "trades": [
+      {
+        "profit": 0.123456789
+      },
+      {
+        "profit": 0.876543211
+      }
+    ]
+  },
+  "config": {
+    "seed": 99,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 2,
+      "netProfit": 1,
+      "avgTradeProfit": 0.5
+    },
+    "metadata": {
+      "inputHash": "f4c53bdde9f88a2b35ed29bfa732f1052af8760b04d261690535c8d26ca066e8",
+      "configHash": "69d4e7d8f592f473f8332ead833003136782c3accefb4c82627bc0089c3704c6"
+    }
+  }
+}

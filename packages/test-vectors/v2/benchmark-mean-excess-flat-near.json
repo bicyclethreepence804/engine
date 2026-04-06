@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "suite": "benchmark",
+  "name": "mean-excess-flat",
+  "description": "Near-flat mean excess: strategy outperforms by ~0.001 per period; validates net-edge conversion stability.",
+  "input": {
+    "aligned": [
+      {
+        "timestamp": 0,
+        "strategy": 100,
+        "btc": 100
+      },
+      {
+        "timestamp": 1,
+        "strategy": 104.1,
+        "btc": 104
+      },
+      {
+        "timestamp": 2,
+        "strategy": 108.36809999999998,
+        "btc": 108.16
+      },
+      {
+        "timestamp": 3,
+        "strategy": 112.81119209999997,
+        "btc": 112.4864
+      }
+    ],
+    "commissionDecimal": 0.001,
+    "slippageDecimal": 0.0005
+  },
+  "expected": {
+    "approx": {
+      "meanExcessPerPeriod": 0.001,
+      "netEdgeBps": -20
+    },
+    "approxDigits": 2,
+    "metadata": {
+      "fixtureHash": "fc5fe518b76469cbcef42e3e145b217c9a7e027182fc4a3c7127c93f49f1effd"
+    }
+  }
+}

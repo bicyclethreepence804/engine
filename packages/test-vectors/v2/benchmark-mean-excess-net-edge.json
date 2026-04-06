@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "suite": "benchmark",
+  "name": "mean-excess-net-edge",
+  "description": "Aligned strategy/BTC points -> period returns, mean excess, net edge bps.",
+  "input": {
+    "aligned": [
+      {
+        "timestamp": 0,
+        "strategy": 100,
+        "btc": 50
+      },
+      {
+        "timestamp": 1,
+        "strategy": 105,
+        "btc": 52
+      },
+      {
+        "timestamp": 2,
+        "strategy": 103,
+        "btc": 51
+      }
+    ],
+    "commissionDecimal": 0.001,
+    "slippageDecimal": 0.0005
+  },
+  "expected": {
+    "approx": {
+      "meanExcessPerPeriod": 0.005091575091575092,
+      "netEdgeBps": 20.92
+    },
+    "approxDigits": 2,
+    "metadata": {
+      "fixtureHash": "73e57d5b1d7c2811006fc347d7dc00a6559b492191bf1d7e1feda4c68b98ee9c"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "suite": "benchmark",
+  "name": "fallback-one-year",
+  "description": "Fallback comparison with ~1y BTC span and 10% strategy total return.",
+  "input": {
+    "totalReturn": 0.1,
+    "btcKlines": [
+      {
+        "timestamp": 0,
+        "close": 100
+      },
+      {
+        "timestamp": 31557600000,
+        "close": 110
+      }
+    ],
+    "years": 1,
+    "commissionDecimal": 0.001,
+    "slippageDecimal": 0.0005
+  },
+  "expected": {
+    "exact": {
+      "strategyCAGR": 10,
+      "btcCAGR": 10,
+      "excessReturn": 0,
+      "informationRatio": 0,
+      "correlationToBTC": null,
+      "feesPerTrade": 0.001,
+      "slippagePerTrade": 0.0005
+    },
+    "metadata": {
+      "fixtureHash": "e1eec0e2383dccdfa2182a3ae49c71bfb5c69cfe60fc87f6aa7a6de487a350a5"
+    }
+  }
+}

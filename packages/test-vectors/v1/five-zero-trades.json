@@ -1,0 +1,39 @@
+{
+  "name": "five-zero-trades",
+  "description": "Multiple trades with zero profit each (costs-only style edge case).",
+  "input": {
+    "strategyId": "flat-five",
+    "trades": [
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      },
+      {
+        "profit": 0
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 5,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "1299a375bc9616e23699a76f63cad901f5718274cbdc65a79f2391653eb58a47",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

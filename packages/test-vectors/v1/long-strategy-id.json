@@ -1,0 +1,27 @@
+{
+  "name": "long-strategy-id",
+  "description": "Long ASCII strategyId for hash and payload size edge.",
+  "input": {
+    "strategyId": "strategy-id-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "trades": [
+      {
+        "profit": 3.14
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 1,
+      "netProfit": 3.14,
+      "avgTradeProfit": 3.14
+    },
+    "metadata": {
+      "inputHash": "ccf07aad91f08853af9b77a9c4dc73e7ea0612e7e494b1b5238400e501812dbf",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

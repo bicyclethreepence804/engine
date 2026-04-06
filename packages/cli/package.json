@@ -1,0 +1,44 @@
+{
+  "name": "@kiploks/engine-cli",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiploks/engine.git"
+  },
+  "homepage": "https://github.com/kiploks/engine#readme",
+  "bugs": {
+    "url": "https://github.com/kiploks/engine/issues"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "kiploks": "bin/kiploks.cjs"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@kiploks/engine-contracts": "0.1.0",
+    "@kiploks/engine-core": "0.1.0",
+    "@kiploks/engine-adapters": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "license": "Apache-2.0"
+}

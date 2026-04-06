@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "single-outlier",
+  "description": "Single positive return: PF cap, dominance warning, many NaN tail stats.",
+  "input": {
+    "R": [
+      0.05
+    ],
+    "options": {
+      "oosWindowCount": 1
+    }
+  },
+  "expected": {
+    "approx": {
+      "sharpeRatio": 0,
+      "maxDrawdown": 0,
+      "gainToPain": 100
+    },
+    "approxDigits": 5,
+    "expectNan": [
+      "var",
+      "sortinoRatio",
+      "expectedShortfall95",
+      "skewness",
+      "kurtosis",
+      "edgeStabilityZScore",
+      "durbinWatson"
+    ],
+    "exact": {
+      "metrics": {
+        "profitFactor": 20,
+        "expectancy": 0.05,
+        "winRate": 1
+      },
+      "oosWindowCount": 1,
+      "totalTrades": 1,
+      "analysis_engine_version": "3.0"
+    },
+    "metadata": {
+      "fixtureHash": "c51f10d32ad26c362af9fd8dd11e52783ca3eb4ba68974833ccacf8d0c10022b"
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "summary": {
+    "totalTrades": 6,
+    "netProfit": 0.045,
+    "avgTradeProfit": 0.0075
+  },
+  "metadata": {
+    "engineVersion": "0.1.0",
+    "formulaVersion": "2.2.0",
+    "riskAnalysisVersion": 1,
+    "contractVersion": "1.0.0",
+    "inputHash": "847ba52fb18a8f49309c9e364aae3b543dd7b35bdeaf95c95adc24bab81357a2",
+    "configHash": "f4c74bb41733471e04c9a7ec9926b9645542949f700dcb161e8d6e697f6e661a",
+    "seed": 42,
+    "decimals": 8,
+    "wfaSchemaVersion": "2.0.0",
+    "wfaInputMode": "tradeSlicedPseudoWfa",
+    "robustnessScoreImputed": true
+  },
+  "robustnessScore": 0,
+  "wfe": {
+    "rankWfe": 1.7268862090290664,
+    "permutationPValue": 0.16,
+    "permutationN": 1000,
+    "windowCount": 7,
+    "seed": 42,
+    "verdict": "ROBUST",
+    "compositeScore": 100
+  },
+  "consistency": {
+    "verdict": "ROBUST",
+    "compositeScore": 100,
+    "rankWfe": 1.7268862090290664,
+    "permutationPValue": 0.16
+  },
+  "parameterStability": {
+    "available": false,
+    "reason": "parameters_not_provided"
+  },
+  "benchmark": {
+    "available": false,
+    "reason": "equity_curve_not_provided"
+  },
+  "robustnessNarrative": {
+    "available": false,
+    "reason": "narrative_not_in_public_wfa"
+  },
+  "dqg": {
+    "available": false,
+    "reason": "dqg_not_in_public_wfa"
+  },
+  "killSwitch": {
+    "available": false,
+    "reason": "kill_switch_verdict_not_in_public_wfa"
+  },
+  "warnings": [
+    {
+      "code": "PSEUDO_WFA_INTERPRETATION",
+      "block": "wfe",
+      "message": "tradeSlicedPseudoWfa uses period slicing without per-window re-optimization; interpret WFE as pseudo-WFA robustness."
+    },
+    {
+      "code": "LOW_TRADE_COUNT",
+      "block": "wfe",
+      "message": "Only 6 trades; WFE and related metrics are less reliable below ~30 trades."
+    },
+    {
+      "code": "SHORT_HISTORY",
+      "block": "wfe",
+      "message": "History span is about 9.0 months; prefer 12+ months for stability views."
+    },
+    {
+      "code": "LOW_TRADE_COUNT",
+      "block": "wfe",
+      "message": "Only 7 windows; more windows improve reliability."
+    },
+    {
+      "code": "SHORT_HISTORY",
+      "block": "wfe",
+      "message": "Window span is about 9.0 months; prefer 12+ months where possible."
+    },
+    {
+      "code": "ROBUSTNESS_SCORE_USES_IMPUTED_DATA",
+      "block": "robustnessScore",
+      "message": "robustnessScore is computed with imputed envelope inputs in public WFA mode."
+    },
+    {
+      "code": "WEAK_STATISTICAL_SIGNIFICANCE",
+      "block": "wfe",
+      "message": "WFE permutation p-value = 0.160 (>= 0.10). Strategy rank WFE may not differ from random OOS shuffles across 7 windows."
+    }
+  ]
+}

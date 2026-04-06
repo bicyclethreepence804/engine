@@ -1,0 +1,27 @@
+{
+  "name": "alt-seed-decimals",
+  "description": "Non-default seed and reduced decimals for config hash coverage.",
+  "input": {
+    "strategyId": "alt",
+    "trades": [
+      {
+        "profit": 1
+      }
+    ]
+  },
+  "config": {
+    "seed": 7,
+    "decimals": 4
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 1,
+      "netProfit": 1,
+      "avgTradeProfit": 1
+    },
+    "metadata": {
+      "inputHash": "0f28da6a4e713cce5e5114b7e8f5530eb8f0f076ad6dacbcef7d9539663f4890",
+      "configHash": "42196ac7b81ba4c865ee30b5e5cb3b14dc7335a70d6bdd326c4b0bffbb091f1e"
+    }
+  }
+}

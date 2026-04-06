@@ -1,0 +1,21 @@
+{
+  "name": "omitted-trades-field",
+  "input": {
+    "strategyId": "demo-no-array"
+  },
+  "config": {
+    "seed": 1,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 0,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "0c1f024a1406fae47fa124d1f99303cee6466f5b4864e45cbb60107fb4ec7ef1",
+      "configHash": "fadd3bd495f378c8ee1b129480b1a64e4be44766adf66b92ee26168da080ea0e"
+    }
+  }
+}

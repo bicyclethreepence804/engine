@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "suite": "benchmark",
+  "name": "mean-excess-net-edge",
+  "description": "Extra mean-excess sample with >3 aligned points to vary period return distribution.",
+  "input": {
+    "aligned": [
+      {
+        "timestamp": 0,
+        "strategy": 100,
+        "btc": 50
+      },
+      {
+        "timestamp": 1,
+        "strategy": 112,
+        "btc": 52
+      },
+      {
+        "timestamp": 2,
+        "strategy": 115,
+        "btc": 53
+      },
+      {
+        "timestamp": 3,
+        "strategy": 118,
+        "btc": 54
+      }
+    ],
+    "commissionDecimal": 0.001,
+    "slippageDecimal": 0.0005
+  },
+  "expected": {
+    "approx": {
+      "meanExcessPerPeriod": 0.031591325682794096,
+      "netEdgeBps": 285.91
+    },
+    "approxDigits": 2,
+    "metadata": {
+      "fixtureHash": "971129a74ab52fe28bd85aea68dc7fae8a7806097d2597c23fc8bdf030d7107a"
+    }
+  }
+}

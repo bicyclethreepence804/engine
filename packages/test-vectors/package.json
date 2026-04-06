@@ -1,0 +1,29 @@
+{
+  "name": "@kiploks/engine-test-vectors",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiploks/engine.git"
+  },
+  "homepage": "https://github.com/kiploks/engine#readme",
+  "bugs": {
+    "url": "https://github.com/kiploks/engine/issues"
+  },
+  "type": "module",
+  "files": [
+    "v1",
+    "v2",
+    "CONFORMANCE.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "Apache-2.0",
+  "exports": {
+    "./v1/*": "./v1/*",
+    "./v2/*": "./v2/*",
+    "./CONFORMANCE.md": "./CONFORMANCE.md"
+  }
+}

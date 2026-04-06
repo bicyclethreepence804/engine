@@ -1,0 +1,50 @@
+{
+  "name": "@kiploks/engine-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Kiploks Open Core engine - npm packages: contracts, core, adapters, CLI, test vectors. This folder is the git root of the published engine repository.",
+  "keywords": [
+    "algorithmic-trading",
+    "walk-forward-analysis",
+    "wfa",
+    "backtest",
+    "backtest-validation",
+    "trading-strategy",
+    "quantitative-finance",
+    "typescript",
+    "kiploks",
+    "open-core",
+    "risk-metrics",
+    "reproducible-analytics",
+    "out-of-sample",
+    "trading-research"
+  ],
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync-versions": "node scripts/sync-engine-versions.mjs",
+    "build": "npm run build -w @kiploks/engine-contracts -w @kiploks/engine-core -w @kiploks/engine-adapters -w @kiploks/engine-cli",
+    "lint": "eslint .",
+    "test": "vitest run -c vitest.config.ts",
+    "test:coverage": "vitest run -c vitest.config.ts --coverage",
+    "engine:check:boundary": "node scripts/check-engine-boundary.mjs",
+    "engine:check:bundle": "node scripts/check-open-core-bundles.mjs",
+    "engine:validate": "npm run lint && npm run test && npm run engine:check:boundary && npm run engine:check:bundle",
+    "engine:examples:generate-samples": "node docs/examples/scripts/generate-samples.mjs",
+    "engine:publish:dry-run": "npm publish --dry-run -w @kiploks/engine-contracts -w @kiploks/engine-core -w @kiploks/engine-adapters -w @kiploks/engine-cli -w @kiploks/engine-test-vectors"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "eslint": "^10.2.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.0",
+    "vitest": "^2.1.9"
+  }
+}

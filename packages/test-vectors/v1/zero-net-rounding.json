@@ -1,0 +1,35 @@
+{
+  "name": "zero-net-rounding",
+  "input": {
+    "strategyId": "demo-flat",
+    "trades": [
+      {
+        "profit": 10
+      },
+      {
+        "profit": -10
+      },
+      {
+        "profit": 2.5
+      },
+      {
+        "profit": -2.5
+      }
+    ]
+  },
+  "config": {
+    "seed": 0,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 4,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "05ddff0cadc60b5def9bc3144afb5e1d0081c8634c94500e56b5ba400d4fbe6b",
+      "configHash": "adf49fd7ef3e9135bd93331ee3d714d85ab77cfc993d4abeaa29342dd8a2f922"
+    }
+  }
+}

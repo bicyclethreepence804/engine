@@ -1,0 +1,29 @@
+{
+  "name": "fractional-rounding-net-profit-first",
+  "description": "Rounding checks: netProfit is rounded first, then avgTradeProfit is derived.",
+  "input": {
+    "trades": [
+      {
+        "profit": 0.335
+      },
+      {
+        "profit": 0.335
+      }
+    ]
+  },
+  "config": {
+    "seed": 7,
+    "decimals": 2
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 2,
+      "netProfit": 0.67,
+      "avgTradeProfit": 0.34
+    },
+    "metadata": {
+      "inputHash": "34f668a75a2298e3f801944dc6685b905b39ca97379a92bd3c022bc42a507526",
+      "configHash": "cb070a8459f964248eb19b24271f752136b03655833653dbe6056d5dff95e5e5"
+    }
+  }
+}

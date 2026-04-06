@@ -1,0 +1,71 @@
+{
+  "name": "@kiploks/engine-core",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiploks/engine.git"
+  },
+  "homepage": "https://github.com/kiploks/engine#readme",
+  "bugs": {
+    "url": "https://github.com/kiploks/engine/issues"
+  },
+  "keywords": [
+    "algorithmic-trading",
+    "walk-forward-analysis",
+    "wfa",
+    "backtest",
+    "backtest-validation",
+    "trading-strategy",
+    "quantitative-finance",
+    "typescript",
+    "kiploks",
+    "open-core",
+    "risk-metrics",
+    "reproducible-analytics",
+    "out-of-sample",
+    "trading-research"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./internal": {
+      "kiploks-internal": {
+        "types": "./dist/internal.d.ts",
+        "default": "./dist/internal.js"
+      },
+      "types": "./dist/internal.d.ts",
+      "default": "./dist/internal.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "internal": [
+        "dist/internal.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "node ../../scripts/engine-core-prepack.mjs strip",
+    "postpack": "node ../../scripts/engine-core-prepack.mjs restore"
+  },
+  "dependencies": {
+    "@kiploks/engine-contracts": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "license": "Apache-2.0"
+}

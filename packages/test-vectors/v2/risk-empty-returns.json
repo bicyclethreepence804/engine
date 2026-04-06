@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "empty-returns",
+  "description": "Empty R array: early-return NaN metrics (no OOS window).",
+  "input": {
+    "R": [],
+    "options": {
+      "oosWindowCount": 0
+    }
+  },
+  "expected": {
+    "expectNan": [
+      "maxDrawdown",
+      "sharpeRatio",
+      "var",
+      "recoveryFactor",
+      "sortinoRatio",
+      "expectedShortfall95",
+      "gainToPain",
+      "skewness",
+      "kurtosis",
+      "edgeStabilityZScore",
+      "durbinWatson"
+    ],
+    "expectMetricsNan": [
+      "profitFactor",
+      "expectancy",
+      "winRate"
+    ],
+    "exact": {
+      "oosWindowCount": 0,
+      "analysis_engine_version": "3.0"
+    },
+    "metadata": {
+      "fixtureHash": "5435fd765ae742d7794ecaa1d2abc809010b21529aab062e0d10532880eb5dac"
+    }
+  }
+}

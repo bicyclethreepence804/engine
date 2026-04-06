@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "suite": "risk",
+  "name": "one-window",
+  "description": "One-window risk: validates expected NaN subset for downside stability metrics.",
+  "input": {
+    "R": [
+      0.01
+    ],
+    "options": {
+      "oosWindowCount": 1
+    }
+  },
+  "expected": {
+    "approx": {
+      "sharpeRatio": 0,
+      "maxDrawdown": 0,
+      "gainToPain": 100
+    },
+    "approxDigits": 5,
+    "expectNan": [
+      "var",
+      "expectedShortfall95",
+      "sortinoRatio",
+      "edgeStabilityZScore",
+      "durbinWatson",
+      "skewness",
+      "kurtosis"
+    ],
+    "metadata": {
+      "fixtureHash": "c91b6fc9f97af0b40983547debce36fc422e75800feeb9cc8d126c8ef14ef2d6"
+    }
+  }
+}

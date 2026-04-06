@@ -1,0 +1,26 @@
+{
+  "name": "single-trade",
+  "input": {
+    "strategyId": "demo-one",
+    "trades": [
+      {
+        "profit": 100
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 1,
+      "netProfit": 100,
+      "avgTradeProfit": 100
+    },
+    "metadata": {
+      "inputHash": "ed1b61e0c2dbcbd62d1000da540786f3c2f39a44d6feefe8ed00b7fac47e125f",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

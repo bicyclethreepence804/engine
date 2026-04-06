@@ -1,0 +1,36 @@
+{
+  "name": "basic-profitability",
+  "input": {
+    "strategyId": "demo-basic",
+    "trades": [
+      {
+        "profit": 100.123456789
+      },
+      {
+        "profit": -45.333333333
+      },
+      {
+        "profit": 12.5
+      }
+    ],
+    "tags": [
+      "demo",
+      "conformance"
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": 67.29012346,
+      "avgTradeProfit": 22.43004115
+    },
+    "metadata": {
+      "inputHash": "50f7dd39999247ba027c01c3df2a2b8e3740095b0a82c86ed969d00fb0db2994",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

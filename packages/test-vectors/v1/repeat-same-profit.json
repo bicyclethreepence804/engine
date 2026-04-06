@@ -1,0 +1,33 @@
+{
+  "name": "repeat-same-profit",
+  "description": "Identical per-trade profits; checks summation and averaging.",
+  "input": {
+    "strategyId": "repeat",
+    "trades": [
+      {
+        "profit": 2
+      },
+      {
+        "profit": 2
+      },
+      {
+        "profit": 2
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": 6,
+      "avgTradeProfit": 2
+    },
+    "metadata": {
+      "inputHash": "4f110f843dc0e85fa32454179b5d00521b7146a360472966a3f5bf59d6e0fad4",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

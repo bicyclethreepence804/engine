@@ -1,0 +1,22 @@
+{
+  "name": "zero-trades",
+  "input": {
+    "strategyId": "demo-empty",
+    "trades": []
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 8
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 0,
+      "netProfit": 0,
+      "avgTradeProfit": 0
+    },
+    "metadata": {
+      "inputHash": "8f5156ccac1f881e2fcd558f45a7520dba9b1f5a35772dd42cc5f40f84817557",
+      "configHash": "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384"
+    }
+  }
+}

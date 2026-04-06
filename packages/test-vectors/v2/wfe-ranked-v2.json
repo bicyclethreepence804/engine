@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "suite": "wfe",
+  "name": "ranked-v2",
+  "description": "Rank WFE + one-sided permutation p-value (WFE v2); deterministic for fixed seed and permutationN.",
+  "input": {
+    "isReturns": [0.3, 0.1, 0.2],
+    "oosReturns": [0.05, 0.2, 0.09],
+    "seed": 424242,
+    "permutationN": 1000
+  },
+  "expected": {
+    "approx": {
+      "rankWfe": 1.4444444444444444,
+      "permutationPValue": 0.186
+    },
+    "approxDigits": 5,
+    "exact": {
+      "permutationN": 1000,
+      "windowCount": 3,
+      "seed": 424242,
+      "verdict": "ROBUST",
+      "compositeScore": 100
+    },
+    "metadata": {
+      "fixtureHash": "b448cf518a23aaf4dd8da6774e2118179e5c0cf342bfa065be87f85ba247c0e9"
+    }
+  }
+}

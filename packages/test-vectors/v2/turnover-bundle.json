@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "suite": "turnover",
+  "name": "zscore-primary-slippage",
+  "description": "Pure turnover core: z-score, primary constraint label, slippage ladder shape.",
+  "cases": [
+    {
+      "id": "trade-zscore",
+      "tradeReturnBps": [
+        100,
+        -50,
+        30,
+        20
+      ],
+      "expected": {
+        "approx": {
+          "zScore": 0.8146881698903526
+        },
+        "approxDigits": 5
+      }
+    },
+    {
+      "id": "zscore-equal-bps",
+      "tradeReturnBps": [
+        10,
+        10,
+        10
+      ],
+      "expected": {
+        "expectZScoreNaN": true
+      }
+    },
+    {
+      "id": "zscore-single-bps",
+      "tradeReturnBps": [
+        42
+      ],
+      "expected": {
+        "expectZScoreNaN": true
+      }
+    },
+    {
+      "id": "primary-net-edge",
+      "primaryInput": {
+        "grossEdgeNegative": false,
+        "netEdgeBps": -5,
+        "costEdgeRatioPct": 10,
+        "advPortfolioWeightedPct": 0,
+        "limitFillProbabilityPct": 80
+      },
+      "expected": {
+        "exact": {
+          "primaryConstraint": "Net edge < execution costs"
+        }
+      }
+    },
+    {
+      "id": "slippage-ladder",
+      "slippageInput": {
+        "initialBalance": 100000,
+        "slippagePct": -2,
+        "netCagrPct": 10,
+        "avgParticipation": 0.01,
+        "advUtilPct": 5
+      },
+      "expected": {
+        "exact": {
+          "rowCount": 4,
+          "firstAum": 100000
+        },
+        "approx": {
+          "firstNetCagrPct": 10
+        },
+        "approxDigits": 5
+      }
+    },
+    {
+      "id": "trade-zscore-positive-strong",
+      "tradeReturnBps": [
+        10,
+        20,
+        5,
+        15
+      ],
+      "expected": {
+        "approx": {
+          "zScore": 3.872983346207417
+        },
+        "approxDigits": 5
+      }
+    },
+    {
+      "id": "trade-zscore-negative-strong",
+      "tradeReturnBps": [
+        -10,
+        -5,
+        -15,
+        -20
+      ],
+      "expected": {
+        "approx": {
+          "zScore": -3.872983346207417
+        },
+        "approxDigits": 5
+      }
+    },
+    {
+      "id": "trade-zscore-mixed",
+      "tradeReturnBps": [
+        20,
+        -10,
+        30,
+        5
+      ],
+      "expected": {
+        "approx": {
+          "zScore": 1.2857142857142858
+        },
+        "approxDigits": 5
+      }
+    },
+    {
+      "id": "primary-high-fee-edge",
+      "primaryInput": {
+        "grossEdgeNegative": false,
+        "netEdgeBps": 5,
+        "costEdgeRatioPct": 40,
+        "advPortfolioWeightedPct": 0,
+        "limitFillProbabilityPct": 80
+      },
+      "expected": {
+        "exact": {
+          "primaryConstraint": "High fee/edge ratio"
+        }
+      }
+    },
+    {
+      "id": "primary-liquid-adv-constraint",
+      "primaryInput": {
+        "grossEdgeNegative": false,
+        "netEdgeBps": 5,
+        "costEdgeRatioPct": 10,
+        "advPortfolioWeightedPct": 0.6,
+        "limitFillProbabilityPct": 80
+      },
+      "expected": {
+        "exact": {
+          "primaryConstraint": "Liquidity/ADV constraint"
+        }
+      }
+    },
+    {
+      "id": "primary-low-fill-probability",
+      "primaryInput": {
+        "grossEdgeNegative": false,
+        "netEdgeBps": 5,
+        "costEdgeRatioPct": 10,
+        "advPortfolioWeightedPct": 0.1,
+        "limitFillProbabilityPct": 40
+      },
+      "expected": {
+        "exact": {
+          "primaryConstraint": "Low fill probability"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "metadata": {
+      "fixtureHash": "e4ea91965bd01021eb1d5485e4ce6da26b955fed516e47ce689dd55ea37e9e3d"
+    }
+  }
+}

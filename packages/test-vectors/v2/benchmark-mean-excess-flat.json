@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "suite": "benchmark",
+  "name": "mean-excess-flat",
+  "description": "Flat strategy and BTC curves: zero mean excess, negative net edge bps after costs.",
+  "input": {
+    "aligned": [
+      {
+        "timestamp": 0,
+        "strategy": 100,
+        "btc": 100
+      },
+      {
+        "timestamp": 86400000,
+        "strategy": 100,
+        "btc": 100
+      }
+    ],
+    "commissionDecimal": 0.001,
+    "slippageDecimal": 0.0005
+  },
+  "expected": {
+    "approx": {
+      "meanExcessPerPeriod": 0,
+      "netEdgeBps": -30
+    },
+    "approxDigits": 2,
+    "metadata": {
+      "fixtureHash": "d4f24baae7bc05cfac9b1696f426707cd4def2d49094e059d1172a01bb0eb668"
+    }
+  }
+}

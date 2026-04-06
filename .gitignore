@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build outputs (workspace packages)
+dist/
+*.tsbuildinfo
+
+# Tests / coverage
+coverage/
+coverage-engine/
+
+# Logs and debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# npm pack
+*.tgz
+
+# Temp / scratch
+.tmp/
+temp/

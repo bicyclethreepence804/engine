@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kiploks Open Core - engine output map and developer guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+        --bg: #0f1419;
+        --panel: #1a2332;
+        --border: #2d3a4d;
+        --text: #e6edf3;
+        --muted: #8b9cb3;
+        --green: #3fb950;
+        --amber: #d29922;
+        --red: #f85149;
+        --link: #58a6ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.55;
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+      }
+      h2 {
+        font-size: 1rem;
+        margin: 1rem 0 0.5rem;
+        font-weight: 600;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 0.9rem;
+        max-width: 56rem;
+        margin-bottom: 1rem;
+      }
+      .tabs {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .tabs button {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 0.4rem 0.7rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+      .tabs button[aria-selected="true"] {
+        border-color: var(--link);
+        color: var(--link);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        align-items: start;
+      }
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .col-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+      }
+      .card h3 {
+        margin: 0 0 0.5rem;
+        font-size: 0.95rem;
+      }
+      .kv {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.25rem 1rem;
+        font-size: 0.85rem;
+      }
+      .kv dt {
+        color: var(--muted);
+      }
+      .kv dd {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+        word-break: break-word;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-robust {
+        color: var(--green);
+        border: 1px solid rgba(63, 185, 80, 0.5);
+      }
+      .badge-acceptable {
+        color: var(--amber);
+        border: 1px solid rgba(210, 153, 34, 0.5);
+      }
+      .badge-weak {
+        color: var(--red);
+        border: 1px solid rgba(248, 81, 73, 0.5);
+      }
+      .block-off {
+        opacity: 0.85;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .warn {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.65rem;
+        border-left: 3px solid var(--amber);
+        background: rgba(210, 153, 34, 0.08);
+        margin-bottom: 0.35rem;
+        border-radius: 0 4px 4px 0;
+      }
+      .warn code {
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+      pre.raw,
+      pre.code {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        overflow: auto;
+        max-height: min(48vh, 520px);
+        padding: 0.75rem;
+        background: #0d1117;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+      }
+      pre.code {
+        max-height: none;
+      }
+      code,
+      kbd,
+      .tabs code {
+        font-family: var(--font-mono);
+      }
+      .product-map {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .product-map strong {
+        color: var(--text);
+      }
+      .setup-list {
+        margin: 0.35rem 0 0.75rem 1.1rem;
+        padding: 0;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      .setup-list li {
+        margin-bottom: 0.35rem;
+      }
+      .setup-list code,
+      .card code {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        background: rgba(110, 118, 129, 0.2);
+        padding: 0.1rem 0.25rem;
+        border-radius: 4px;
+      }
+      table.ref {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+      }
+      table.ref th,
+      table.ref td {
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.5rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      table.ref th {
+        background: rgba(88, 166, 255, 0.08);
+        color: var(--muted);
+        font-weight: 600;
+      }
+      table.ref code {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+      }
+      a {
+        color: var(--link);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .note {
+        font-size: 0.82rem;
+        color: var(--muted);
+        border-left: 3px solid var(--border);
+        padding-left: 0.75rem;
+        margin: 0.5rem 0;
+      }
+      .callout-expected {
+        margin-top: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(63, 185, 80, 0.45);
+        background: rgba(63, 185, 80, 0.07);
+        font-size: 0.84rem;
+        line-height: 1.5;
+        color: var(--text);
+      }
+      .callout-expected h4 {
+        margin: 0 0 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--green);
+        letter-spacing: 0.02em;
+      }
+      .callout-expected ol {
+        margin: 0.35rem 0 0;
+        padding-left: 1.2rem;
+        color: var(--muted);
+      }
+      .callout-expected ol strong {
+        color: var(--text);
+      }
+      .callout-expected .mono {
+        font-size: 0.78rem;
+        color: var(--text);
+      }
+      .mono {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Open Core engine - output map and developer guide</h1>
+    <p class="lede">
+      Deterministic JSON from <code>@kiploks/engine-core</code> and how it relates to product-style blocks. Use the tabs below for setup instructions, each public entrypoint, and contract reference. This file is static documentation, not the production UI.
+    </p>
+
+    <div class="tabs" role="tablist" aria-label="Main sections">
+      <button type="button" data-tab="setup" role="tab" aria-selected="true" aria-controls="panel-setup">
+        Developer setup
+      </button>
+      <button type="button" data-tab="min" role="tab" aria-selected="false" aria-controls="panel-min">
+        <code>analyze()</code>
+      </button>
+      <button type="button" data-tab="trade" role="tab" aria-selected="false" aria-controls="panel-trade">
+        <code>analyzeFromTrades()</code>
+      </button>
+      <button type="button" data-tab="win" role="tab" aria-selected="false" aria-controls="panel-win">
+        <code>analyzeFromWindows()</code>
+      </button>
+      <button type="button" data-tab="ref" role="tab" aria-selected="false" aria-controls="panel-ref">
+        Verdicts &amp; contract reference
+      </button>
+    </div>
+
+    <!-- Setup -->
+    <section id="panel-setup" role="tabpanel" aria-labelledby="tab-setup">
+      <div class="card">
+        <h3>1. Work inside the engine repository (contributors)</h3>
+        <p class="product-map">From the <strong>engine</strong> folder (Open Core git root):</p>
+        <pre class="code">cd engine
+npm install
+npm run build
+npm run engine:examples:generate-samples</pre>
+        <p class="note">
+          Regenerates <code>docs/examples/sample-output/*.json</code>. After formula changes, sync embedded samples in this file (<code>SAMPLE_*</code> constants) if you need the HTML to match byte-for-byte.
+        </p>
+      </div>
+      <div class="card">
+        <h3>2. Consume published packages (integrators)</h3>
+        <pre class="code">npm install @kiploks/engine-core @kiploks/engine-contracts</pre>
+        <ul class="setup-list">
+          <li>
+            Types: <code>AnalyzeInput</code>, <code>AnalyzeOutput</code>, <code>TradeBasedWFAInput</code>,
+            <code>PrecomputedWFAInput</code>, <code>WFAAnalysisOutput</code> from
+            <code>@kiploks/engine-contracts</code>.
+          </li>
+          <li>
+            API: <code>analyze()</code>, <code>analyzeFromTrades()</code>, <code>analyzeFromWindows()</code> from
+            <code>@kiploks/engine-core</code>.
+          </li>
+        </ul>
+        <h3>Minimal TypeScript</h3>
+        <pre class="code">import { analyze } from "@kiploks/engine-core";
+
+const result = analyze(
+  { trades: [{ profit: 0.05 }, { profit: -0.02 }] },
+  { seed: 42, decimals: 8 },
+);
+console.log(result.summary, result.metadata);</pre>
+      </div>
+      <div class="card">
+        <h3>3. Markdown examples (same folder as this file)</h3>
+        <p class="product-map">Copy-paste tutorials (English only in sources):</p>
+        <table class="ref">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Topic</th>
+            </tr>
+          </thead>
+          <tbody id="doc-links-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>4. CLI (<code>@kiploks/engine-cli</code>)</h3>
+        <pre class="code">npx kiploks --help
+npx kiploks validate &lt;file.json&gt; --schema trade-based-wfa --explain
+npx kiploks analyze &lt;input.json&gt; --json --seed 42 --decimals 8
+npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
+  --in-sample-months 2 --out-of-sample-months 1 --step rolling</pre>
+        <p class="note">Install CLI globally or as a dev dependency if you prefer a local <code>kiploks</code> binary.</p>
+      </div>
+      <div class="card">
+        <h3>5. Open this HTML file</h3>
+        <ul class="setup-list">
+          <li>Double-click <code>result-layout-demo.html</code>, or</li>
+          <li>
+            <code>open docs/examples/result-layout-demo.html</code> (macOS), or run a static server from
+            <code>docs/examples</code> if your browser blocks local scripts.
+          </li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>6. Full product report (benchmark, risk, kill switch)</h3>
+        <p class="product-map">
+          Public WFA JSON often has <code>available: false</code> on optional blocks. The hosted app builds
+          <code>TestResultData</code> on the server. See
+          <code>docs/examples/09-full-report-vs-public-wfa.md</code> in this repo.
+        </p>
+      </div>
+    </section>
+
+    <!-- Minimal analyze -->
+    <section id="panel-min" role="tabpanel" hidden>
+      <div class="grid">
+        <div>
+          <div class="col-title">Conceptual product blocks</div>
+          <div class="card">
+            <h3>Trade summary</h3>
+            <div class="kv">
+              <dt>Total trades</dt>
+              <dd id="min-total">-</dd>
+              <dt>Net profit</dt>
+              <dd id="min-net">-</dd>
+              <dt>Avg trade</dt>
+              <dd id="min-avg">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Reproducibility</h3>
+            <p class="product-map">
+              <strong>engineVersion</strong>, <strong>formulaVersion</strong>, <strong>riskAnalysisVersion</strong>,
+              <strong>contractVersion</strong>, <strong>inputHash</strong>, <strong>configHash</strong>,
+              <strong>seed</strong>, <strong>decimals</strong>.
+            </p>
+            <div class="kv" style="margin-top: 0.5rem">
+              <dt>Engine</dt>
+              <dd id="min-eng">-</dd>
+              <dt>Formula</dt>
+              <dd id="min-formula">-</dd>
+            </div>
+          </div>
+          <p class="note">
+            <strong>Settings:</strong> <code>AnalyzeConfig</code> - <code>seed</code> (default 42),
+            <code>decimals</code> (default from contracts). No WFA-specific options on <code>analyze()</code>.
+          </p>
+        </div>
+        <div>
+          <div class="col-title">Raw <code>AnalyzeOutput</code> (synced with <code>sample-output/minimal-analyze.json</code>)</div>
+          <pre class="raw" id="min-json"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- analyzeFromTrades -->
+    <section id="panel-trade" role="tabpanel" hidden>
+      <p class="note">
+        <strong>Input:</strong> <code>TradeBasedWFAInput</code> - <code>trades</code> with
+        <code>openTime</code>/<code>closeTime</code> (Unix ms), <code>windowConfig</code> (inSampleMonths,
+        outOfSampleMonths, stepMode <code>anchored</code> | <code>rolling</code>),
+        <code>wfaInputMode: "tradeSlicedPseudoWfa"</code>, optional <code>equityCurve</code> for benchmark path.
+      </p>
+      <div class="grid">
+        <div>
+          <div class="col-title">Conceptual product blocks</div>
+          <div class="card">
+            <h3>Trade summary</h3>
+            <div class="kv">
+              <dt>Total trades</dt>
+              <dd id="wfa-total">-</dd>
+              <dt>Net profit</dt>
+              <dd id="wfa-net">-</dd>
+              <dt>Avg trade</dt>
+              <dd id="wfa-avg">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>WFE / walk-forward</h3>
+            <div class="kv">
+              <dt>Rank WFE</dt>
+              <dd id="wfa-rank">-</dd>
+              <dt>Permutation p-value</dt>
+              <dd id="wfa-p">-</dd>
+              <dt>Windows</dt>
+              <dd id="wfa-win">-</dd>
+              <dt>Verdict</dt>
+              <dd id="wfa-verdict-wrap">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Robustness score (0-100 aggregate)</h3>
+            <p class="block-off" style="margin-top: -0.25rem; margin-bottom: 0.5rem">
+              This is <strong>not</strong> the same field as <span class="mono">wfe.verdict</span> above.
+            </p>
+            <p class="kv">
+              <code>robustnessScore</code>:
+              <span id="wfa-rob">-</span>
+            </p>
+            <p class="block-off"><code>metadata.robustnessScoreImputed</code> may be true in public WFA.</p>
+            <div class="callout-expected">
+              <h4>Expected in this sample: verdict ROBUST and score 0 (not a bug)</h4>
+              <p style="margin: 0 0 0.5rem; color: var(--muted)">
+                At a glance this pair can look wrong. It is intentional: two independent pipelines fill different
+                fields.
+              </p>
+              <ol>
+                <li>
+                  <strong>WFE verdict</strong> (<span class="mono">wfe.verdict</span>, e.g. ROBUST) comes only from
+                  rank-WFE and permutation p-value heuristics. It does not set the numeric robustness score.
+                </li>
+                <li>
+                  <strong>Robustness score</strong> (<span class="mono">robustnessScore</span>) is computed by
+                  <span class="mono">calculateRobustnessScoreFromWfa</span> (four modules: validation, risk, stability,
+                  execution). Public WFA passes an <strong>imputed</strong> input. With no parameter-sensitivity data,
+                  the stability module is 0; blocked modules force the final score to
+                  <span class="mono">0</span> (see <span class="mono">core/src/robustnessScoreFromWfa.ts</span>).
+                </li>
+                <li>
+                  A full product <span class="mono">TestResultData</span> build can supply real module inputs and then
+                  the score can be non-zero while WFE verdict stays as computed.
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Optional blocks</h3>
+            <div class="kv">
+              <dt>parameterStability</dt>
+              <dd id="wfa-ps">-</dd>
+              <dt>benchmark</dt>
+              <dd id="wfa-bench">-</dd>
+              <dt>robustnessNarrative</dt>
+              <dd id="wfa-nar">-</dd>
+              <dt>dqg</dt>
+              <dd id="wfa-dqg">-</dd>
+              <dt>killSwitch</dt>
+              <dd id="wfa-ks">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Warnings</h3>
+            <div id="wfa-warnings"></div>
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Raw <code>WFAAnalysisOutput</code> (trade-sliced sample)</div>
+          <pre class="raw" id="wfa-json"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- analyzeFromWindows -->
+    <section id="panel-win" role="tabpanel" hidden>
+      <p class="note">
+        <strong>Input:</strong> <code>PrecomputedWFAInput</code> - <code>wfaInputMode: "precomputed"</code>,
+        <code>windows</code> (length &gt;= 2), optional <code>equityCurve</code>. If you pass a curve with at least two
+        points, <code>benchmark</code> may become <code>available: true</code> with CAGR / drawdown-style data.
+      </p>
+      <div class="grid">
+        <div>
+          <div class="col-title">Conceptual blocks (precomputed sample)</div>
+          <div class="card">
+            <h3>Metadata</h3>
+            <div class="kv">
+              <dt>wfaInputMode</dt>
+              <dd id="win-mode">-</dd>
+              <dt>wfaSchemaVersion</dt>
+              <dd id="win-schema">-</dd>
+              <dt>Summary net (from windows)</dt>
+              <dd id="win-net">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>WFE</h3>
+            <div class="kv">
+              <dt>Verdict</dt>
+              <dd id="win-verdict">-</dd>
+              <dt>rankWfe</dt>
+              <dd id="win-rank">-</dd>
+              <dt>permutationPValue</dt>
+              <dd id="win-p">-</dd>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Benchmark block</h3>
+            <p id="win-bench-desc" class="block-off">-</p>
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Raw JSON (illustrative precomputed + no equity curve)</div>
+          <pre class="raw" id="win-json"></pre>
+        </div>
+      </div>
+      <div class="card" style="margin-top: 1rem">
+        <h3>When <code>benchmark.available === true</code> (illustrative)</h3>
+        <p class="block-off">
+          Provide <code>equityCurve: [{ timestamp, value }, ...]</code> with at least two points. The engine fills
+          <code>benchmark.data</code> (for example point count, CAGR, max drawdown fraction). Below is a mocked
+          shape for UI integration tests only.
+        </p>
+        <pre class="raw" id="bench-available-json"></pre>
+      </div>
+    </section>
+
+    <!-- Reference -->
+    <section id="panel-ref" role="tabpanel" hidden>
+      <p class="note" style="margin-bottom: 1rem; max-width: 52rem">
+        The <strong>methodology page</strong> in the product (e.g. <span class="mono">/methodology</span>) documents
+        <strong>Walk-Forward Efficiency bands</strong> on the <strong>median OOS/IS ratio</strong> (PASS / ACCEPTABLE /
+        WARN / FAIL) and a separate <strong>Final Verdict</strong> (ROBUST / CAUTION / DO NOT DEPLOY). The Open Core
+        JSON field <span class="mono">wfe.verdict</span> is a <strong>different</strong> label set: rank-WFE thresholds
+        from <span class="mono">verdictFromRankWfe</span> in the engine. Do not mix them up when reading this demo.
+      </p>
+      <div class="card">
+        <h3>1. Open Core JSON: <code>wfe.verdict</code> (rank-WFE heuristic)</h3>
+        <p class="product-map">
+          Source: <span class="mono">core/src/wfa/wfeCalculator.ts</span> (<span class="mono">verdictFromRankWfe</span>).
+          Based on <strong>rankWfe</strong> (mean of OOS rank / IS rank per window), not on the median OOS/IS ratio table
+          below.
+        </p>
+        <table class="ref">
+          <thead>
+            <tr>
+              <th>Condition (rankWfe)</th>
+              <th><code>wfe.verdict</code></th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>rankWfe &ge; 1.15</code></td>
+              <td><span class="badge badge-robust">ROBUST</span></td>
+              <td>Strong rank transfer (heuristic).</td>
+            </tr>
+            <tr>
+              <td><code>1.06 &le; rankWfe &lt; 1.15</code></td>
+              <td><span class="badge badge-acceptable">ACCEPTABLE</span></td>
+              <td>Middle band on rank scale.</td>
+            </tr>
+            <tr>
+              <td><code>1.0 &le; rankWfe &lt; 1.06</code></td>
+              <td><span class="badge badge-weak">WEAK</span></td>
+              <td>Low rank transfer.</td>
+            </tr>
+            <tr>
+              <td><code>rankWfe &lt; 1.0</code></td>
+              <td><span class="badge badge-weak">FAIL</span></td>
+              <td>
+                Also forced FAIL in <span class="mono">buildWfeResult</span> when mean IS &gt; 0 and mean OOS &lt; 0.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="block-off" style="margin-top: 0.65rem">
+          Badge colors here mirror the product palette for teaching only. Labels
+          <strong>ROBUST / ACCEPTABLE / WEAK</strong> in this column are <strong>not</strong> the methodology PASS/WARN
+          bands and <strong>not</strong> the Final Verdict row.
+        </p>
+      </div>
+      <div class="card">
+        <h3>2. Product methodology: Walk-Forward Efficiency (median OOS/IS)</h3>
+        <p class="product-map">
+          Same threshold copy as the Kiploks methodology page Walk-Forward section (reference UI).
+          This describes the <strong>efficiency ratio</strong>, not <span class="mono">wfe.verdict</span> in Open Core
+          JSON.
+        </p>
+        <table class="ref">
+          <thead>
+            <tr>
+              <th>Range (median OOS/IS)</th>
+              <th>Label</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>&ge; 0.7</code></td>
+              <td>PASS</td>
+              <td>Robust carry-over; the strategy &quot;behaves&quot; as expected.</td>
+            </tr>
+            <tr>
+              <td><code>0.5 – 0.7</code></td>
+              <td>ACCEPTABLE</td>
+              <td>Adequate stability; monitor for alpha decay.</td>
+            </tr>
+            <tr>
+              <td><code>0.2 – 0.5</code></td>
+              <td>WARN</td>
+              <td>Fragile; significant performance drop Out-of-Sample.</td>
+            </tr>
+            <tr>
+              <td><code>&lt; 0.2</code></td>
+              <td>FAIL</td>
+              <td>High overfitting risk; the &quot;tuned&quot; edge does not exist.</td>
+            </tr>
+            <tr>
+              <td>N/A</td>
+              <td>&mdash;</td>
+              <td>Insufficient statistical evidence (need 3 windows with in-sample return &gt; 0).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>3. Product methodology: Final Verdict (report summary)</h3>
+        <p class="product-map">
+          End-of-report verdict from multiple gates (robustness score, DQG, WFE, risk, costs). Not stored as
+          <span class="mono">wfe.verdict</span> in the minimal Open Core contract.
+        </p>
+        <table class="ref">
+          <thead>
+            <tr>
+              <th>Verdict</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-robust">ROBUST</span></td>
+              <td>Strategy passes validation, risk, and cost checks. Review the full report and consider deploying.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-acceptable">CAUTION</span></td>
+              <td>Some gates failed or are borderline. Fix the flagged issues before deploying.</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-weak">DO NOT DEPLOY</span></td>
+              <td>
+                Critical failures detected (e.g. data quality, WFE, or risk). Address all summary items before any
+                deployment.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3><code>AnalyzeConfig</code> (second argument to all three entrypoints)</h3>
+        <table class="ref">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>seed</code></td>
+              <td>Permutation and deterministic draws (default 42).</td>
+            </tr>
+            <tr>
+              <td><code>decimals</code></td>
+              <td>Rounding for profits and hashes (default from contracts).</td>
+            </tr>
+            <tr>
+              <td><code>permutationN</code></td>
+              <td>WFE permutation count (default 1000; bounds 100..10000 in contracts).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3><code>BlockResult</code> when <code>available: false</code> - reason codes</h3>
+        <p class="note">From <code>@kiploks/engine-contracts</code> (<code>KiploksUnavailableReason</code>).</p>
+        <table class="ref" id="table-reasons"></table>
+      </div>
+      <div class="card">
+        <h3><code>KiploksWarning.code</code> (non-fatal)</h3>
+        <table class="ref" id="table-warnings"></table>
+      </div>
+    </section>
+
+    <script>
+      const SAMPLE_MINIMAL = {
+        summary: { totalTrades: 3, netProfit: 0.11, avgTradeProfit: 0.03666667 },
+        metadata: {
+          engineVersion: "0.1.0",
+          formulaVersion: "2.2.0",
+          riskAnalysisVersion: 1,
+          contractVersion: "1.0.0",
+          inputHash: "b414efa82f2a1cee5d3eb02caa352ffb5632a3c51986d62b5c97c3301bc84e6d",
+          configHash: "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384",
+          seed: 42,
+          decimals: 8,
+        },
+      };
+
+      const SAMPLE_WFA = {
+        summary: { totalTrades: 6, netProfit: 0.045, avgTradeProfit: 0.0075 },
+        metadata: {
+          engineVersion: "0.1.0",
+          formulaVersion: "2.2.0",
+          riskAnalysisVersion: 1,
+          contractVersion: "1.0.0",
+          inputHash: "847ba52fb18a8f49309c9e364aae3b543dd7b35bdeaf95c95adc24bab81357a2",
+          configHash: "f4c74bb41733471e04c9a7ec9926b9645542949f700dcb161e8d6e697f6e661a",
+          seed: 42,
+          decimals: 8,
+          wfaSchemaVersion: "2.0.0",
+          wfaInputMode: "tradeSlicedPseudoWfa",
+          robustnessScoreImputed: true,
+        },
+        robustnessScore: 0,
+        wfe: {
+          rankWfe: 1.7268862090290664,
+          permutationPValue: 0.16,
+          permutationN: 1000,
+          windowCount: 7,
+          seed: 42,
+          verdict: "ROBUST",
+          compositeScore: 100,
+        },
+        consistency: {
+          verdict: "ROBUST",
+          compositeScore: 100,
+          rankWfe: 1.7268862090290664,
+          permutationPValue: 0.16,
+        },
+        parameterStability: { available: false, reason: "parameters_not_provided" },
+        benchmark: { available: false, reason: "equity_curve_not_provided" },
+        robustnessNarrative: { available: false, reason: "narrative_not_in_public_wfa" },
+        dqg: { available: false, reason: "dqg_not_in_public_wfa" },
+        killSwitch: { available: false, reason: "kill_switch_verdict_not_in_public_wfa" },
+        warnings: [
+          {
+            code: "PSEUDO_WFA_INTERPRETATION",
+            block: "wfe",
+            message:
+              "tradeSlicedPseudoWfa uses period slicing without per-window re-optimization; interpret WFE as pseudo-WFA robustness.",
+          },
+          {
+            code: "LOW_TRADE_COUNT",
+            block: "wfe",
+            message: "Only 6 trades; WFE and related metrics are less reliable below ~30 trades.",
+          },
+          {
+            code: "SHORT_HISTORY",
+            block: "wfe",
+            message: "History span is about 9.0 months; prefer 12+ months for stability views.",
+          },
+          {
+            code: "LOW_TRADE_COUNT",
+            block: "wfe",
+            message: "Only 7 windows; more windows improve reliability.",
+          },
+          {
+            code: "SHORT_HISTORY",
+            block: "wfe",
+            message: "Window span is about 9.0 months; prefer 12+ months where possible.",
+          },
+          {
+            code: "ROBUSTNESS_SCORE_USES_IMPUTED_DATA",
+            block: "robustnessScore",
+            message: "robustnessScore is computed with imputed envelope inputs in public WFA mode.",
+          },
+          {
+            code: "WEAK_STATISTICAL_SIGNIFICANCE",
+            block: "wfe",
+            message:
+              "WFE permutation p-value = 0.160 (>= 0.10). Strategy rank WFE may not differ from random OOS shuffles across 7 windows.",
+          },
+        ],
+      };
+
+      const SAMPLE_PRECOMPUTED = {
+        summary: { totalTrades: 0, netProfit: 0.1448, avgTradeProfit: 0 },
+        metadata: {
+          engineVersion: "0.1.0",
+          formulaVersion: "2.2.0",
+          riskAnalysisVersion: 1,
+          contractVersion: "1.0.0",
+          inputHash: "(depends on windows + equity length)",
+          configHash: "b9351baf2232b15cc2cbf1a3f0d2114b864cbe93e3baf1dc19582c4f0cde0384",
+          seed: 42,
+          decimals: 8,
+          wfaSchemaVersion: "2.0.0",
+          wfaInputMode: "precomputed",
+          robustnessScoreImputed: true,
+        },
+        robustnessScore: 42,
+        wfe: {
+          rankWfe: 0.5,
+          permutationPValue: 0.186,
+          permutationN: 1000,
+          windowCount: 2,
+          seed: 42,
+          verdict: "ACCEPTABLE",
+          compositeScore: 72,
+        },
+        consistency: {
+          verdict: "ACCEPTABLE",
+          compositeScore: 72,
+          rankWfe: 0.5,
+          permutationPValue: 0.186,
+        },
+        parameterStability: { available: false, reason: "parameters_not_provided" },
+        benchmark: { available: false, reason: "equity_curve_not_provided" },
+        robustnessNarrative: { available: false, reason: "narrative_not_in_public_wfa" },
+        dqg: { available: false, reason: "dqg_not_in_public_wfa" },
+        killSwitch: { available: false, reason: "kill_switch_verdict_not_in_public_wfa" },
+        warnings: [
+          {
+            code: "LOW_WINDOW_COUNT",
+            block: "wfe",
+            message: "Only 2 windows; treat WFE/consistency as directional only.",
+          },
+          {
+            code: "ROBUSTNESS_SCORE_USES_IMPUTED_DATA",
+            block: "robustnessScore",
+            message: "robustnessScore is computed with imputed envelope inputs in public WFA mode.",
+          },
+        ],
+      };
+
+      const SAMPLE_BENCHMARK_AVAILABLE = {
+        available: true,
+        data: {
+          pointCount: 3,
+          cagr: 0.127,
+          maxDrawdownFraction: 0.08,
+          firstTimestamp: 1577836800000,
+          lastTimestamp: 1583020800000,
+        },
+      };
+
+      const DOC_LINKS = [
+        ["01-minimal-analyze.md", "Minimal analyze() + optional CLI"],
+        ["02-wfa-from-trades.md", "analyzeFromTrades() pseudo-WFA"],
+        ["03-wfa-from-windows.md", "analyzeFromWindows() precomputed windows"],
+        ["04-csv-to-trades.md", "CSV to Trade[]"],
+        ["05-cli-validate-and-analyze-trades.md", "validate + analyze-trades"],
+        ["06-cloud-upload-parity.md", "upload --cloud parity"],
+        ["07-metadata-and-reproducibility.md", "metadata hashes"],
+        ["08-result-shape-and-kiploks-ui.md", "JSON vs UI blocks"],
+        ["09-full-report-vs-public-wfa.md", "full TestResultData vs public WFA"],
+        ["10-methodology-flow-and-engine.md", "methodology block order vs engine modules"],
+      ];
+
+      const UNAVAILABLE_REASONS = [
+        ["parameters_not_provided", "Parameter stability needs per-window parameters in input."],
+        ["equity_curve_not_provided", "Benchmark block needs equityCurve (or full product pipeline)."],
+        ["insufficient_windows_for_block", "Not enough windows for this block."],
+        ["precomputed_mode_only", "Some paths only apply to precomputed windows."],
+        ["narrative_not_in_public_wfa", "Narrative block not filled in public WFA."],
+        ["dqg_not_in_public_wfa", "DQG requires full product / payload."],
+        ["kill_switch_verdict_not_in_public_wfa", "Kill switch evaluation needs full report inputs."],
+      ];
+
+      const WARNING_CODES = [
+        ["LOW_TRADE_COUNT", "wfe"],
+        ["LOW_WINDOW_COUNT", "wfe"],
+        ["EMPTY_WINDOWS_DETECTED", "wfe"],
+        ["HIGH_DEGRADATION", "wfe"],
+        ["SINGLE_DIRECTION_ONLY", "wfe"],
+        ["SHORT_HISTORY", "wfe"],
+        ["PSEUDO_WFA_INTERPRETATION", "wfe"],
+        ["ROBUSTNESS_SCORE_USES_IMPUTED_DATA", "robustnessScore"],
+        ["WEAK_STATISTICAL_SIGNIFICANCE", "wfe"],
+      ];
+
+      function verdictClass(v) {
+        if (v === "ROBUST") return "badge badge-robust";
+        if (v === "ACCEPTABLE") return "badge badge-acceptable";
+        return "badge badge-weak";
+      }
+
+      function blockLine(b) {
+        if (b.available) return "available (see data)";
+        return "off - " + b.reason;
+      }
+
+      function fillMinimal() {
+        const m = SAMPLE_MINIMAL;
+        document.getElementById("min-total").textContent = String(m.summary.totalTrades);
+        document.getElementById("min-net").textContent = String(m.summary.netProfit);
+        document.getElementById("min-avg").textContent = String(m.summary.avgTradeProfit);
+        document.getElementById("min-eng").textContent = m.metadata.engineVersion;
+        document.getElementById("min-formula").textContent = m.metadata.formulaVersion;
+        document.getElementById("min-json").textContent = JSON.stringify(m, null, 2);
+      }
+
+      function fillWfa() {
+        const w = SAMPLE_WFA;
+        document.getElementById("wfa-total").textContent = String(w.summary.totalTrades);
+        document.getElementById("wfa-net").textContent = String(w.summary.netProfit);
+        document.getElementById("wfa-avg").textContent = String(w.summary.avgTradeProfit);
+        document.getElementById("wfa-rank").textContent = String(w.wfe.rankWfe);
+        document.getElementById("wfa-p").textContent = String(w.wfe.permutationPValue);
+        document.getElementById("wfa-win").textContent = String(w.wfe.windowCount);
+        const vw = document.getElementById("wfa-verdict-wrap");
+        vw.innerHTML = "";
+        const span = document.createElement("span");
+        span.className = verdictClass(w.wfe.verdict);
+        span.textContent = w.wfe.verdict;
+        vw.appendChild(span);
+        document.getElementById("wfa-rob").textContent = String(w.robustnessScore);
+        document.getElementById("wfa-ps").textContent = blockLine(w.parameterStability);
+        document.getElementById("wfa-bench").textContent = blockLine(w.benchmark);
+        document.getElementById("wfa-nar").textContent = blockLine(w.robustnessNarrative);
+        document.getElementById("wfa-dqg").textContent = blockLine(w.dqg);
+        document.getElementById("wfa-ks").textContent = blockLine(w.killSwitch);
+        const host = document.getElementById("wfa-warnings");
+        host.innerHTML = "";
+        w.warnings.forEach(function (x) {
+          const d = document.createElement("div");
+          d.className = "warn";
+          d.innerHTML = "<code>" + x.code + "</code> &middot; " + escapeHtml(x.message);
+          host.appendChild(d);
+        });
+        document.getElementById("wfa-json").textContent = JSON.stringify(w, null, 2);
+      }
+
+      function fillPrecomputed() {
+        const p = SAMPLE_PRECOMPUTED;
+        document.getElementById("win-mode").textContent = p.metadata.wfaInputMode;
+        document.getElementById("win-schema").textContent = p.metadata.wfaSchemaVersion;
+        document.getElementById("win-net").textContent = String(p.summary.netProfit);
+        const wv = document.getElementById("win-verdict");
+        wv.innerHTML = "";
+        const s = document.createElement("span");
+        s.className = verdictClass(p.wfe.verdict);
+        s.textContent = p.wfe.verdict;
+        wv.appendChild(s);
+        document.getElementById("win-rank").textContent = String(p.wfe.rankWfe);
+        document.getElementById("win-p").textContent = String(p.wfe.permutationPValue);
+        document.getElementById("win-bench-desc").textContent =
+          "Without equityCurve: benchmark is " + blockLine(p.benchmark) + ".";
+        document.getElementById("win-json").textContent = JSON.stringify(p, null, 2);
+        document.getElementById("bench-available-json").textContent = JSON.stringify(
+          { benchmark: SAMPLE_BENCHMARK_AVAILABLE },
+          null,
+          2,
+        );
+      }
+
+      function fillDocLinks() {
+        const tbody = document.getElementById("doc-links-table");
+        DOC_LINKS.forEach(function (row) {
+          const tr = document.createElement("tr");
+          const td1 = document.createElement("td");
+          td1.innerHTML = '<a href="./' + row[0] + '">' + escapeHtml(row[0]) + "</a>";
+          const td2 = document.createElement("td");
+          td2.textContent = row[1];
+          tr.appendChild(td1);
+          tr.appendChild(td2);
+          tbody.appendChild(tr);
+        });
+      }
+
+      function fillReasonTables() {
+        const tr = document.getElementById("table-reasons");
+        tr.innerHTML =
+          "<thead><tr><th>reason</th><th>Typical meaning</th></tr></thead><tbody></tbody>";
+        const tb = tr.querySelector("tbody");
+        UNAVAILABLE_REASONS.forEach(function (r) {
+          const row = document.createElement("tr");
+          row.innerHTML = "<td><code>" + r[0] + "</code></td><td>" + escapeHtml(r[1]) + "</td>";
+          tb.appendChild(row);
+        });
+
+        const tw = document.getElementById("table-warnings");
+        tw.innerHTML =
+          "<thead><tr><th>code</th><th>Typical block</th></tr></thead><tbody></tbody>";
+        const twb = tw.querySelector("tbody");
+        WARNING_CODES.forEach(function (r) {
+          const row = document.createElement("tr");
+          row.innerHTML =
+            "<td><code>" + r[0] + "</code></td><td><code>" + r[1] + "</code></td>";
+          twb.appendChild(row);
+        });
+      }
+
+      function escapeHtml(s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      const panels = {
+        setup: document.getElementById("panel-setup"),
+        min: document.getElementById("panel-min"),
+        trade: document.getElementById("panel-trade"),
+        win: document.getElementById("panel-win"),
+        ref: document.getElementById("panel-ref"),
+      };
+
+      document.querySelectorAll('[role="tablist"] button[data-tab]').forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const key = btn.getAttribute("data-tab");
+          document.querySelectorAll('[role="tablist"] button[data-tab]').forEach(function (b) {
+            b.setAttribute("aria-selected", b.getAttribute("data-tab") === key);
+          });
+          Object.keys(panels).forEach(function (k) {
+            panels[k].hidden = k !== key;
+          });
+        });
+      });
+
+      fillMinimal();
+      fillWfa();
+      fillPrecomputed();
+      fillDocLinks();
+      fillReasonTables();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "fractional-rounding-avg",
+  "description": "Rounding checks with fractional profits and explicit 2-decimal output policy.",
+  "input": {
+    "trades": [
+      {
+        "profit": 0.3333
+      },
+      {
+        "profit": 0.3333
+      },
+      {
+        "profit": 0.3334
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 2
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 3,
+      "netProfit": 1,
+      "avgTradeProfit": 0.33
+    },
+    "metadata": {
+      "inputHash": "e81b61b423a69503c9b988510b3cf66877cd96cc551d3bafe8759a33686b47e8",
+      "configHash": "4ed38fbbdf06cd165b9035c0cc31229093a73cfa760fdfc2d8c721227d58af6b"
+    }
+  }
+}

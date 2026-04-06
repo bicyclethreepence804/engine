@@ -1,0 +1,29 @@
+{
+  "name": "negative-precision",
+  "description": "Negative precision rounding: verifies netProfit and avgTradeProfit with mixed negative decimals.",
+  "input": {
+    "trades": [
+      {
+        "profit": -1.005
+      },
+      {
+        "profit": -2.335
+      }
+    ]
+  },
+  "config": {
+    "seed": 42,
+    "decimals": 2
+  },
+  "expected": {
+    "summary": {
+      "totalTrades": 2,
+      "netProfit": -3.34,
+      "avgTradeProfit": -1.67
+    },
+    "metadata": {
+      "inputHash": "5fd2f25d17ceb69ef8bcf3b168cb626311901296f2c0d4dd2e60ba5798f0d8f0",
+      "configHash": "4ed38fbbdf06cd165b9035c0cc31229093a73cfa760fdfc2d8c721227d58af6b"
+    }
+  }
+}
