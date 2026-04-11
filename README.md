@@ -13,6 +13,8 @@ Deterministic **walk-forward analysis** and backtest validation engine for algor
 
 **Main repository:** [github.com/kiploks/engine](https://github.com/kiploks/engine)
 
+If you find this engine useful, please **[give it a star](https://github.com/kiploks/engine)** on GitHub — stars help others discover the repo and improve its visibility in GitHub search and rankings.
+
 Same formulas power [Kiploks](https://kiploks.com) in the cloud.
 
 ## Status
