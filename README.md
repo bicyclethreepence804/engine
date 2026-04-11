@@ -7,6 +7,8 @@ Deterministic **walk-forward analysis** and backtest validation engine for algor
 
 **Browse the full docs on the web:** **[kiploks.com/open-engine](https://kiploks.com/open-engine)** (same Markdown as in `docs/` below).
 
+**Research & methodology articles:** **[kiploks.com/research](https://kiploks.com/research)** — long-form guides on walk-forward analysis, robustness, overfitting, costs and slippage, Freqtrade/OctoBot workflows, and strategy validation aligned with the same ideas as this engine (helps discoverability for people searching those topics).
+
 **New here?** Read **[`docs/ENTRYPOINTS.md`](docs/ENTRYPOINTS.md)** first — it maps **which function to call** (`analyze`, `analyzeFromTrades`, `analyzeFromWindows`, CSV adapters, `mapPayloadToUnified`) and what each expects.
 
 **Main repository:** [github.com/kiploks/engine](https://github.com/kiploks/engine)
@@ -25,7 +27,7 @@ Feedback and PRs welcome.
 
 ## About Kiploks (kiploks.com)
 
-[Kiploks](https://kiploks.com) is the product: a service for **serious strategy research** - institutional-style diagnostics, clear verdicts, and workflows built around **transparent, versioned methodology**. The hosted app adds collaboration, storage, integrations, and UI on top of the same analytical ideas you get in these packages.
+[Kiploks](https://kiploks.com) is the product: a service for **serious strategy research** - institutional-style diagnostics, clear verdicts, and workflows built around **transparent, versioned methodology**. The hosted app adds collaboration, storage, integrations, and UI on top of the same analytical ideas you get in these packages. The public **[Research](https://kiploks.com/research)** section publishes standalone articles on methodology and validation that complement the Open Core docs above.
 
 ## Philosophy
 
