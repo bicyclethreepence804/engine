@@ -40,6 +40,6 @@ After changing `VERSION`, commit, then sync, then rebuild and run checks before 
 ## CI and publish (GitHub Actions)
 
 - **CI** (`.github/workflows/ci.yml`): on every PR and push to `main` - `npm ci`, `npm run build`, `npm run engine:validate`.
-- **Release** (`.github/workflows/release.yml`): on push of tag `v*` (e.g. `v0.2.0`). The `VERSION` file must equal the tag without the `v` prefix (`0.2.0`). After bumping `VERSION`, run `npm run sync-versions`, commit, merge, then create and push the tag on that commit.
+- **Release** (`.github/workflows/release.yml`): on push of tag `v*` (e.g. `v0.2.0`). The `VERSION` file must equal the tag without the `v` prefix (`0.2.0`). After bumping `VERSION`, run `npm run sync-versions`, commit, merge, then create and push the tag on that commit. The workflow uses **Node 24** and **Corepack** to activate **npm 11.5.1+** (Trusted Publishing / OIDC); it avoids `npm install -g npm`, which can break on GitHub-hosted runners.
 - **npm:** publishing uses **Trusted Publishing** (OIDC) from this workflow file - no long-lived `NPM_TOKEN` in GitHub. Each `@kiploks/engine-*` package on npmjs.com must list this workflow under Trusted Publisher (filename must match: `release.yml`).
 - Optional: create a **GitHub Release** from the tag for notes; it does not affect npm publish.
