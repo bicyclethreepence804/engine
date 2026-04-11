@@ -2,7 +2,7 @@
 
 You **do not have to** install or call **`@kiploks/engine-core`** or other Open Core npm packages if your workflow is built around **Freqtrade** or **OctoBot**.
 
-Separate repositories ship **Python-side bridges** that send backtest and walk-forward results to **Kiploks** (hosted analysis, API keys, upload flow). They are **not** part of this `engine` repository; they complement it for users who want a direct bot integration instead of mapping exports to `Trade[]` or CSV in Node.
+This **`engine`** tree does **not** contain a Python package such as `kiploks_adapter` or a Freqtrade plugin you install from here. **Separate repositories** ship **Python-side bridges** that send backtest and walk-forward results to **Kiploks** (hosted analysis, API keys, upload flow). They complement this repo for users who want a direct bot integration instead of mapping exports to `Trade[]` or CSV in Node.
 
 | Integration | Repository |
 | ----------- | ---------- |

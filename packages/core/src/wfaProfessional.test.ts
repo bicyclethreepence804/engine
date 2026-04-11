@@ -321,4 +321,45 @@ describe("wfaProfessional", () => {
     expect(out!.professional.institutionalGradeOverride?.actualFailureRate).toBeCloseTo(4 / 6, 5);
     expect(out!.professionalMeta.guardsTriggered).toContain("FAIL_VERDICT_HIGH_FAILURE_RATE");
   });
+
+  it("monteCarloValidation is identical for same seed, periods, and bootstrapN", () => {
+    const wfa = {
+      periods: [
+        { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+        { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+        { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+      ],
+    } as never;
+    const a = runProfessionalWfa(wfa, { seed: 42, bootstrapN: 500 });
+    const b = runProfessionalWfa(wfa, { seed: 42, bootstrapN: 500 });
+    expect(a?.professional.monteCarloValidation).toEqual(b?.professional.monteCarloValidation);
+  });
+
+  it("handles two windows (edge case) and records default bootstrap iteration count", () => {
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.02, parameters: { p: 1 } },
+          { optimizationReturn: 0.11, validationReturn: 0.01, parameters: { p: 2 } },
+        ],
+      } as never,
+      { seed: 5 },
+    );
+    expect(out).not.toBeNull();
+    expect(out?.professional.monteCarloValidation?.verdict).toBeDefined();
+    expect(out?.professionalMeta.inputsSummary.monteCarloBootstrapIterations).toBe(1000);
+  });
+
+  it("respects bootstrapN in professional options", () => {
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+        ],
+      } as never,
+      { seed: 1, bootstrapN: 200 },
+    );
+    expect(out?.professionalMeta.inputsSummary.monteCarloBootstrapIterations).toBe(200);
+  });
 });

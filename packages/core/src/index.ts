@@ -62,6 +62,18 @@ export {
   type TryBuildBenchmarkComparisonInput,
 } from "./benchmarkFromEquity";
 export * from "./wfaProfessional";
+export { buildPathMonteCarloSimulation } from "./pathMonteCarlo";
+export type {
+  DistributionStats,
+  MonteCarloPercentileSet,
+  PathMonteCarloBlock,
+  PathMonteCarloEquityPoint,
+  PathMonteCarloMeta,
+  PathMonteCarloOptions,
+  PathMonteCarloResult,
+  PathStability,
+  TailRisk,
+} from "@kiploks/engine-contracts";
 export * from "./robustnessScoreFromWfa";
 export * from "./wfaStandaloneTransform";
 export * from "./metricDefinitionContract";

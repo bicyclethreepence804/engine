@@ -239,7 +239,11 @@ export function analyzeFromWindows(
     normalizedCurves,
   };
 
-  const built = buildProfessionalWfa(validation, { seed, permutationN });
+  const built = buildProfessionalWfa(validation, {
+    seed,
+    permutationN,
+    bootstrapN: config.monteCarloBootstrapN,
+  });
   if (!built) {
     throw new KiploksValidationError(
       "INVALID_RETURN_VALUE",

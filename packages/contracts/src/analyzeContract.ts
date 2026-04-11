@@ -51,4 +51,8 @@ export type AnalyzeConfig = {
    * Permutation count for WFE p-value. Default and bounds: `WFE_PERMUTATION_N_*` in `@kiploks/engine-contracts`.
    */
   permutationN?: number;
+  /**
+   * Bootstrap iterations for professional `monteCarloValidation` (window OOS returns). Default 1000; clamped to [100, 50_000].
+   */
+  monteCarloBootstrapN?: number;
 };

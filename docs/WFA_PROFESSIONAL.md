@@ -99,7 +99,11 @@ Key fields:
 
 **Name vs implementation:** The field is called `monteCarloValidation` for API stability. **Current behavior is bootstrap**, not a full Monte Carlo simulation over equity paths or trade sequences.
 
-**What it does today:** The engine takes one **validation (OOS) return per walk-forward window** (`validationReturn`). It **resamples those scalars with replacement** over many iterations (fixed bootstrap iteration count in `wfaProfessional.ts`), builds the empirical distribution of the **mean OOS return** across resamples, then derives **68% and 95% intervals** from percentile cuts of that distribution, **probabilityPositive** (share of bootstrap means above zero), and a **verdict** from those statistics.
+**What it does today:** The engine takes one **validation (OOS) return per walk-forward window** (`validationReturn`). It **resamples those scalars with replacement** over many iterations (default **1000**, clamped to **[100, 50_000]**; override via `AnalyzeConfig.monteCarloBootstrapN` on precomputed WFA / `buildProfessionalWfa` / `runProfessionalWfa` option **`bootstrapN`**), builds the empirical distribution of the **mean OOS return** across resamples, then derives **68% and 95% intervals** with **Hyndman–Fan type 7** (`percentileType7`, same family as path Monte Carlo), **probabilityPositive** (share of bootstrap means above zero), and a **verdict** from the bootstrap distribution only.
+
+**Verdict rules (aligned with implementation):** `CONFIDENT` if `probabilityPositive >= 0.75` and the 95% CI does **not** straddle zero (`ci95Low > 0` or `ci95High < 0`). `PROBABLE` if `probabilityPositive >= 0.6`. `UNCERTAIN` if `probabilityPositive >= 0.5`. Otherwise `DOUBTFUL`.
+
+**PRNG:** Always **Mulberry32** with `seed` from options when finite; otherwise the same default seed as path MC (`PATH_MONTE_CARLO_DEFAULT_SEED` in `pathMonteCarloConstants.ts`). No `Math.random` fallback.
 
 **What it does not do:** No path-dependent simulation (no synthetic full equity curves drawn step-by-step, no shock model over returns beyond window resampling, no strategy-path Monte Carlo).
 

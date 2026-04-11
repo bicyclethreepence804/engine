@@ -261,6 +261,63 @@
         font-family: var(--font-mono);
         font-size: 0.82rem;
       }
+      .mc-pct-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        margin-top: 0.35rem;
+      }
+      .mc-pct-table th,
+      .mc-pct-table td {
+        border: 1px solid var(--border);
+        padding: 0.35rem 0.45rem;
+        text-align: center;
+      }
+      .mc-pct-table th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .mc-bar-track {
+        display: flex;
+        height: 12px;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0.5rem 0 0.25rem;
+        border: 1px solid var(--border);
+      }
+      .mc-bar-track span {
+        flex: 1;
+        min-width: 0;
+      }
+      .mc-bar-p5 {
+        background: rgba(248, 81, 73, 0.45);
+      }
+      .mc-bar-p25 {
+        background: rgba(210, 153, 34, 0.35);
+      }
+      .mc-bar-p50 {
+        background: rgba(88, 166, 255, 0.55);
+      }
+      .mc-bar-p75 {
+        background: rgba(210, 153, 34, 0.35);
+      }
+      .mc-bar-p95 {
+        background: rgba(63, 185, 80, 0.45);
+      }
+      .mc-legend {
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .interp-list {
+        margin: 0.35rem 0 0;
+        padding-left: 1.1rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      .interp-list li {
+        margin-bottom: 0.3rem;
+      }
     </style>
   </head>
   <body>
@@ -282,6 +339,16 @@
       <button type="button" data-tab="win" role="tab" aria-selected="false" aria-controls="panel-win">
         <code>analyzeFromWindows()</code>
       </button>
+      <button
+        type="button"
+        data-tab="monte"
+        data-testid="result-layout-demo-monte-tab"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-monte"
+      >
+        Monte Carlo
+      </button>
       <button type="button" data-tab="ref" role="tab" aria-selected="false" aria-controls="panel-ref">
         Verdicts &amp; contract reference
       </button>
@@ -297,7 +364,12 @@ npm install
 npm run build
 npm run engine:examples:generate-samples</pre>
         <p class="note">
-          Regenerates <code>docs/examples/sample-output/*.json</code>. After formula changes, sync embedded samples in this file (<code>SAMPLE_*</code> constants) if you need the HTML to match byte-for-byte.
+          After <code>npm run build</code>, run <code>npm run engine:examples:generate-samples</code> to refresh
+          <code>docs/examples/sample-output/*.json</code> so they match <code>metadata.engineVersion</code> from the built
+          packages. If the static demo must match those files byte-for-byte, update the embedded
+          <code>SAMPLE_MINIMAL</code> and <code>SAMPLE_WFA</code> objects in this file. The <strong>Monte Carlo</strong>
+          tab uses frozen <code>SAMPLE_PATH_MC</code> and <code>SAMPLE_PRO_MONTE</code>; update those when path MC or
+          professional Monte outputs change (see <code>monte-carlo-example.md</code> and WFA docs).
         </p>
       </div>
       <div class="card">
@@ -557,6 +629,139 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       </div>
     </section>
 
+    <!-- Monte Carlo (path + professional WFA) -->
+    <section id="panel-monte" role="tabpanel" hidden data-testid="result-layout-demo-monte-panel">
+      <p class="note" style="max-width: 56rem">
+        <strong>Two different features in the engine:</strong>
+        <strong>Path MC</strong> (<code>buildPathMonteCarloSimulation</code>) resamples <em>period returns along one equity curve</em>
+        and returns CAGR / max drawdown bands. It is a <strong>separate API call</strong>, not part of
+        <code>analyze()</code> JSON. <strong>Professional <code>monteCarloValidation</code></strong> is a
+        <strong>bootstrap on one OOS return per WFA window</strong> (mean return distribution). It appears when you build
+        professional WFA (e.g. from precomputed windows inside the engine). See
+        <a href="../MONTE_CARLO_PATH.md"><code>MONTE_CARLO_PATH.md</code></a> and
+        <a href="../WFA_PROFESSIONAL.md"><code>WFA_PROFESSIONAL.md</code></a> §5.
+      </p>
+      <div class="grid result-layout-demo-monte-path-grid">
+        <div>
+          <div class="col-title">Path Monte Carlo (illustrative output)</div>
+          <div class="card">
+            <h3>Input (conceptual)</h3>
+            <p class="block-off" style="margin-top: -0.15rem">
+              <code>PathMonteCarloEquityPoint[]</code> with <code>value &gt; 0</code> and optional <code>timestamp</code> (Unix ms).
+              Below: synthetic wavy equity, <code>seed: 42</code>, <code>simulations: 600</code>,
+              <code>horizonYears: 1</code>, <code>minPeriods: 10</code>.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Simulated CAGR band (decimals = annual return)</h3>
+            <p class="mc-legend">Strip: p5 (red tint) to p95 (green tint), darker blue = median neighborhood.</p>
+            <div class="mc-bar-track" aria-hidden="true">
+              <span class="mc-bar-p5" title="p5"></span>
+              <span class="mc-bar-p25" title="p25"></span>
+              <span class="mc-bar-p50" title="p50"></span>
+              <span class="mc-bar-p75" title="p75"></span>
+              <span class="mc-bar-p95" title="p95"></span>
+            </div>
+            <table class="mc-pct-table" data-testid="result-layout-demo-path-mc-pct-table">
+              <thead>
+                <tr>
+                  <th>p5</th>
+                  <th>p25</th>
+                  <th>p50</th>
+                  <th>p75</th>
+                  <th>p95</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="path-mc-cagr-row"></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Simulated max drawdown (negative decimals)</h3>
+            <table class="mc-pct-table" data-testid="result-layout-demo-path-mc-mdd-table">
+              <thead>
+                <tr>
+                  <th>p5</th>
+                  <th>p25</th>
+                  <th>p50</th>
+                  <th>p75</th>
+                  <th>p95</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="path-mc-mdd-row"></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Labels and meta</h3>
+            <div class="kv">
+              <dt><code>pathStability</code></dt>
+              <dd id="path-mc-stab">-</dd>
+              <dt><code>tailRisk</code></dt>
+              <dd id="path-mc-tail">-</dd>
+              <dt><code>probabilityPositive</code></dt>
+              <dd id="path-mc-pp">-</dd>
+              <dt><code>meta.methodVersion</code></dt>
+              <dd id="path-mc-ver">-</dd>
+              <dt><code>meta.periodsUsed</code></dt>
+              <dd id="path-mc-n">-</dd>
+              <dt><code>meta.ruinousPathCount</code></dt>
+              <dd id="path-mc-ruin">-</dd>
+            </div>
+            <p class="block-off" style="margin-top: 0.65rem">
+              <code>meta.approximationsUsed</code> may flag high lag-1 autocorrelation (i.i.d. bootstrap caveat).
+              <code>periodReturnsNeweyWestTStat</code> and <code>periodReturnsAutocorrelationLag1</code> appear when finite.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Interpretation (engine strings)</h3>
+            <ul class="interp-list" id="path-mc-interp"></ul>
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Raw <code>PathMonteCarloResult</code> (frozen sample)</div>
+          <pre class="raw" id="path-mc-json"></pre>
+        </div>
+      </div>
+      <div class="grid result-layout-demo-monte-pro-grid" style="margin-top: 1rem">
+        <div>
+          <div class="col-title">Professional WFA: <code>monteCarloValidation</code></div>
+          <div class="card">
+            <h3>What it is</h3>
+            <p class="block-off" style="margin-top: -0.15rem">
+              Bootstrap distribution of the <strong>mean OOS return</strong> across windows (not path-level equity). CIs use
+              <code>percentileType7</code>. Iteration count: <code>monteCarloBootstrapN</code> in
+              <code>AnalyzeConfig</code> (precomputed) or <code>bootstrapN</code> in
+              <code>runProfessionalWfa</code> options (default 1000, clamp 100-50000).
+            </p>
+          </div>
+          <div class="card">
+            <h3>Illustrative block</h3>
+            <div class="kv">
+              <dt><code>actualMeanReturn</code></dt>
+              <dd id="pro-mc-mean">-</dd>
+              <dt><code>confidenceInterval95</code></dt>
+              <dd id="pro-mc-ci95">-</dd>
+              <dt><code>confidenceInterval68</code></dt>
+              <dd id="pro-mc-ci68">-</dd>
+              <dt><code>probabilityPositive</code></dt>
+              <dd id="pro-mc-pp">-</dd>
+              <dt><code>verdict</code></dt>
+              <dd id="pro-mc-verdict">-</dd>
+              <dt><code>inputsSummary.monteCarloBootstrapIterations</code></dt>
+              <dd id="pro-mc-iters">-</dd>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="col-title">Raw (subset)</div>
+          <pre class="raw" id="pro-mc-json"></pre>
+        </div>
+      </div>
+    </section>
+
     <!-- Reference -->
     <section id="panel-ref" role="tabpanel" hidden>
       <p class="note" style="margin-bottom: 1rem; max-width: 52rem">
@@ -710,6 +915,13 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
               <td><code>permutationN</code></td>
               <td>WFE permutation count (default 1000; bounds 100..10000 in contracts).</td>
             </tr>
+            <tr>
+              <td><code>monteCarloBootstrapN</code></td>
+              <td>
+                Professional <code>monteCarloValidation</code> bootstrap iterations (precomputed
+                <code>analyzeFromWindows</code> only; default 1000, clamp 100..50000).
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -728,7 +940,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       const SAMPLE_MINIMAL = {
         summary: { totalTrades: 3, netProfit: 0.11, avgTradeProfit: 0.03666667 },
         metadata: {
-          engineVersion: "0.1.0",
+          engineVersion: "0.2.0",
           formulaVersion: "2.2.0",
           riskAnalysisVersion: 1,
           contractVersion: "1.0.0",
@@ -742,7 +954,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       const SAMPLE_WFA = {
         summary: { totalTrades: 6, netProfit: 0.045, avgTradeProfit: 0.0075 },
         metadata: {
-          engineVersion: "0.1.0",
+          engineVersion: "0.2.0",
           formulaVersion: "2.2.0",
           riskAnalysisVersion: 1,
           contractVersion: "1.0.0",
@@ -819,7 +1031,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       const SAMPLE_PRECOMPUTED = {
         summary: { totalTrades: 0, netProfit: 0.1448, avgTradeProfit: 0 },
         metadata: {
-          engineVersion: "0.1.0",
+          engineVersion: "0.2.0",
           formulaVersion: "2.2.0",
           riskAnalysisVersion: 1,
           contractVersion: "1.0.0",
@@ -877,6 +1089,83 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
         },
       };
 
+      /** Frozen PathMonteCarloResult from engine (wavy equity curve, seed 42, 600 paths). Sync after algorithm changes. */
+      const SAMPLE_PATH_MC = {
+        cagrDistribution: {
+          p5: 0.20460895842625898,
+          p25: 0.3042152650455838,
+          p50: 0.3904958317905054,
+          p75: 0.48350934336553214,
+          p95: 0.6312340319645741,
+        },
+        maxDrawdownDistribution: {
+          p5: -0.06190932020916595,
+          p25: -0.045209508855836675,
+          p50: -0.03512148199855526,
+          p75: -0.028894429912539696,
+          p95: -0.021298358982541392,
+        },
+        probabilityPositive: 1,
+        probabilityViable: 1,
+        pathStability: "MEDIUM",
+        tailRisk: "LOW",
+        interpretation: [
+          "Median simulated CAGR: 39.05%. Range (5th-95th pct): 20.46% to 63.12%.",
+          "100.0% of simulated paths produced positive CAGR.",
+          "Median simulated max drawdown: -3.51%. Worst-case (5th pct): -6.19%.",
+          "Tail risk: LOW. 95% Expected Shortfall on CAGR distribution: -16.05% annualised loss.",
+          "Path stability: MEDIUM. CAGR outcome spread (p95-p5): 42.66%.",
+          "100.0% of paths were viable (positive CAGR and max drawdown below 50%).",
+          "Method: i.i.d. bootstrap over 79 observed return periods, 600 paths. Does not model serial correlation or regime shifts. Interpret alongside WFA walk-forward results.",
+        ],
+        cagrStats: {
+          mean: 0.3989221266141904,
+          std: 0.12883246059234882,
+          skewness: 0.25902011759795746,
+          kurtosis: -0.22445086272903625,
+          var95: -0.20460895842625898,
+          cvar95: -0.1605176021280189,
+          varCornishFisher95: 0,
+        },
+        maxDrawdownStats: {
+          mean: -0.038112244416762545,
+          std: 0.013209624431444697,
+          skewness: -1.1496347845523756,
+          kurtosis: 1.796668131883056,
+          var95: 0.06190932020916595,
+          cvar95: 0.07294645150307626,
+          varCornishFisher95: 0.06335316189227434,
+        },
+        meta: {
+          methodVersion: "1.1.0",
+          simulationsRun: 600,
+          periodsUsed: 79,
+          seedUsed: 42,
+          horizonYears: 1,
+          horizonFromTimestamps: false,
+          bootstrapMethod: "iid",
+          budgetCapped: false,
+          percentileMethod: "type7",
+          ruinousPathCount: 0,
+          approximationsUsed: [
+            "iid_bootstrap_high_autocorrelation: lag-1 ACF=0.967; i.i.d. bootstrap may understate path variance.",
+          ],
+          periodReturnsAutocorrelationLag1: 0.9674099959655956,
+          periodReturnsNeweyWestTStat: 1.8721661931705906,
+        },
+      };
+
+      const SAMPLE_PRO_MONTE = {
+        monteCarloValidation: {
+          actualMeanReturn: 0.05125,
+          confidenceInterval95: [0.04434375, 0.057499999999999996],
+          confidenceInterval68: [0.0475, 0.055],
+          probabilityPositive: 1,
+          verdict: "CONFIDENT",
+        },
+        inputsSummaryMonteCarloBootstrapIterations: 500,
+      };
+
       const DOC_LINKS = [
         ["01-minimal-analyze.md", "Minimal analyze() + optional CLI"],
         ["02-wfa-from-trades.md", "analyzeFromTrades() pseudo-WFA"],
@@ -888,6 +1177,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
         ["08-result-shape-and-kiploks-ui.md", "JSON vs UI blocks"],
         ["09-full-report-vs-public-wfa.md", "full TestResultData vs public WFA"],
         ["10-methodology-flow-and-engine.md", "methodology block order vs engine modules"],
+        ["monte-carlo-example.md", "Path MC: buildPathMonteCarloSimulation sample call"],
       ];
 
       const UNAVAILABLE_REASONS = [
@@ -915,6 +1205,13 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       function verdictClass(v) {
         if (v === "ROBUST") return "badge badge-robust";
         if (v === "ACCEPTABLE") return "badge badge-acceptable";
+        return "badge badge-weak";
+      }
+
+      function monteCarloVerdictBadge(v) {
+        if (v === "CONFIDENT") return "badge badge-robust";
+        if (v === "PROBABLE") return "badge badge-acceptable";
+        if (v === "UNCERTAIN") return "badge badge-acceptable";
         return "badge badge-weak";
       }
 
@@ -962,6 +1259,59 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
           host.appendChild(d);
         });
         document.getElementById("wfa-json").textContent = JSON.stringify(w, null, 2);
+      }
+
+      function fmtPctDec(x) {
+        return (Number(x) * 100).toFixed(2) + "%";
+      }
+
+      function fillMonte() {
+        const p = SAMPLE_PATH_MC;
+        const c = p.cagrDistribution;
+        const tr = document.getElementById("path-mc-cagr-row");
+        tr.innerHTML = [c.p5, c.p25, c.p50, c.p75, c.p95]
+          .map(function (x) {
+            return "<td>" + fmtPctDec(x) + "</td>";
+          })
+          .join("");
+        const m = p.maxDrawdownDistribution;
+        document.getElementById("path-mc-mdd-row").innerHTML = [m.p5, m.p25, m.p50, m.p75, m.p95]
+          .map(function (x) {
+            return "<td>" + Number(x).toFixed(4) + "</td>";
+          })
+          .join("");
+        document.getElementById("path-mc-stab").textContent = p.pathStability;
+        document.getElementById("path-mc-tail").textContent = p.tailRisk;
+        document.getElementById("path-mc-pp").textContent = String(p.probabilityPositive);
+        document.getElementById("path-mc-ver").textContent = p.meta.methodVersion;
+        document.getElementById("path-mc-n").textContent = String(p.meta.periodsUsed);
+        document.getElementById("path-mc-ruin").textContent = String(p.meta.ruinousPathCount);
+        const ul = document.getElementById("path-mc-interp");
+        ul.innerHTML = "";
+        p.interpretation.forEach(function (line) {
+          const li = document.createElement("li");
+          li.textContent = line;
+          ul.appendChild(li);
+        });
+        document.getElementById("path-mc-json").textContent = JSON.stringify(p, null, 2);
+
+        const pr = SAMPLE_PRO_MONTE;
+        document.getElementById("pro-mc-mean").textContent = String(pr.monteCarloValidation.actualMeanReturn);
+        document.getElementById("pro-mc-ci95").textContent =
+          "[" + pr.monteCarloValidation.confidenceInterval95.join(", ") + "]";
+        document.getElementById("pro-mc-ci68").textContent =
+          "[" + pr.monteCarloValidation.confidenceInterval68.join(", ") + "]";
+        document.getElementById("pro-mc-pp").textContent = String(pr.monteCarloValidation.probabilityPositive);
+        const pv = document.getElementById("pro-mc-verdict");
+        pv.innerHTML = "";
+        const sp = document.createElement("span");
+        sp.className = monteCarloVerdictBadge(pr.monteCarloValidation.verdict);
+        sp.textContent = pr.monteCarloValidation.verdict;
+        pv.appendChild(sp);
+        document.getElementById("pro-mc-iters").textContent = String(
+          pr.inputsSummaryMonteCarloBootstrapIterations,
+        );
+        document.getElementById("pro-mc-json").textContent = JSON.stringify(pr, null, 2);
       }
 
       function fillPrecomputed() {
@@ -1037,6 +1387,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
         min: document.getElementById("panel-min"),
         trade: document.getElementById("panel-trade"),
         win: document.getElementById("panel-win"),
+        monte: document.getElementById("panel-monte"),
         ref: document.getElementById("panel-ref"),
       };
 
@@ -1055,6 +1406,7 @@ npx kiploks analyze-trades &lt;trades.json&gt; --format raw --json \
       fillMinimal();
       fillWfa();
       fillPrecomputed();
+      fillMonte();
       fillDocLinks();
       fillReasonTables();
     </script>

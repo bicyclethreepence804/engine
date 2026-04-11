@@ -9,6 +9,7 @@ import {
   WFE_PERMUTATION_N_MAX,
   WFE_PERMUTATION_N_MIN,
 } from "@kiploks/engine-contracts";
+import { createMulberry32 } from "../prng";
 
 /** 1-based average ranks (tie-aware), same order as input. */
 export function computeAverageRanks(values: number[]): number[] {
@@ -62,17 +63,6 @@ export function computeRankWfe(isReturns: number[], oosReturns: number[]): numbe
   return sum / isReturns.length;
 }
 
-function mulberry32(initial: number): () => number {
-  let state = initial >>> 0;
-  return () => {
-    state += 0x6d2b79f5;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t ^ (t >>> 15));
-    return (t >>> 0) / 4294967296;
-  };
-}
-
 function shuffledOosCopy(oos: number[], rng: () => number): number[] {
   const a = [...oos];
   for (let i = a.length - 1; i > 0; i--) {
@@ -97,7 +87,7 @@ export function computePermutationPValue(
   let count = 0;
   for (let iter = 0; iter < n; iter++) {
     const subSeed = Math.imul(iter, 0x9e3779b1) ^ seed;
-    const rng = mulberry32(subSeed >>> 0);
+    const rng = createMulberry32(subSeed >>> 0);
     const shuffled = shuffledOosCopy(oosReturns, rng);
     const perm = computeRankWfe(isReturns, shuffled);
     if (perm >= observed) count++;

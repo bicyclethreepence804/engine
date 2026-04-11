@@ -31,8 +31,7 @@ Results are **deterministic** for a given input, config, and published version. 
 
 ## API policy
 
-- **Stable (semver)** import from `@kiploks/engine-core` (root). The published package exposes this entry only.
-- The repository includes a secondary `./internal` barrel (re-exports used by full-report assembly). It is **not** part of the npm tarball (`prepack` strips it). Prefer the root import unless you maintain a host that mirrors that assembly graph.
+Use the **root** import `from "@kiploks/engine-core"` only. That is the supported, semver-stable surface on npm. A separate `./internal` path may exist in the **git** tree for in-repo tooling and tests; it is **not** published in the package tarball (`prepack` removes it).
 
 ## License
 
