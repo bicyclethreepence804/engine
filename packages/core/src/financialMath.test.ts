@@ -5,6 +5,7 @@ import {
   calculateAutocorrelationLag1,
   calculateBeta,
   calculateCagr,
+  calculateCagrFromYears,
   calculateCalmarRatio,
   calculateCorrelation,
   calculateCvar,
@@ -40,6 +41,17 @@ describe("financialMath", () => {
     expect(Number.isNaN(calculateCagr(0, 100, t0, t1))).toBe(true);
     expect(Number.isNaN(calculateCagr(100, 100, t0, t0))).toBe(true);
     expect(calculateCagr(100, 121, t0, t1)).toBeGreaterThan(0);
+  });
+
+  it("calculateCagrFromYears matches calculateCagr for same elapsed year span", () => {
+    const msPerYear = 365.25 * 24 * 60 * 60 * 1000;
+    const years = 1.25;
+    const t0 = 0;
+    const t1 = years * msPerYear;
+    const a = calculateCagr(100, 130, t0, t1);
+    const b = calculateCagrFromYears(100, 130, years);
+    expect(b).toBeCloseTo(a, 12);
+    expect(Number.isNaN(calculateCagrFromYears(0, 100, 1))).toBe(true);
   });
 
   it("calculateInformationRatio", () => {

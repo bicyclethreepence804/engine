@@ -58,9 +58,23 @@ function syncRootPackageJson(version) {
   }
 }
 
+function syncContractsEngineVersionConstant(version) {
+  const indexPath = path.join(ENGINE_ROOT, "packages/contracts/src/index.ts");
+  const before = readFileSync(indexPath, "utf8");
+  const after = before.replace(
+    /export const ENGINE_VERSION = "[^"]*";/,
+    `export const ENGINE_VERSION = "${version}";`,
+  );
+  if (before !== after) {
+    writeFileSync(indexPath, after, "utf8");
+    process.stdout.write(`sync-engine-versions: packages/contracts/src/index.ts ENGINE_VERSION -> ${version}\n`);
+  }
+}
+
 const v = readVersion();
 for (const dir of PACKAGES) {
   syncOne(v, dir);
 }
 syncRootPackageJson(v);
+syncContractsEngineVersionConstant(v);
 process.stdout.write(`sync-engine-versions: done (${v}).\n`);

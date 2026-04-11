@@ -26,6 +26,19 @@ export function calculateCagr(
   return Math.pow(endValue / startValue, 1 / years) - 1;
 }
 
+/**
+ * CAGR when the investment horizon is already known in calendar years.
+ * Prefer this over {@link calculateCagr} with synthetic Unix ms when years come from WFA/path MC horizon logic.
+ */
+export function calculateCagrFromYears(
+  startValue: number,
+  endValue: number,
+  years: number,
+): number {
+  if (startValue <= 0 || endValue <= 0 || !Number.isFinite(years) || years <= 0) return Number.NaN;
+  return Math.pow(endValue / startValue, 1 / years) - 1;
+}
+
 export function calculateInformationRatio(excessReturns: number[]): number {
   const mean = calculateMean(excessReturns);
   const stdDev = calculateStdDev(excessReturns, mean);

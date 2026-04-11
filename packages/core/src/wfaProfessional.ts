@@ -16,13 +16,29 @@ import {
   KiploksValidationError,
   WFE_PERMUTATION_P_WEAK_THRESHOLD,
 } from "@kiploks/engine-contracts";
+import { percentileType7 } from "./percentile";
+import { PATH_MONTE_CARLO_DEFAULT_SEED } from "./pathMonteCarloConstants";
+import { createMulberry32 } from "./prng";
 import { buildWfeResult } from "./wfa/wfeCalculator";
 import {
   buildWfaFailedWindowsFromPeriods,
   computeWfaVerdict,
 } from "./wfaStandaloneTransform";
 
-const BOOTSTRAP_ITERATIONS = 1000;
+const DEFAULT_MONTE_CARLO_BOOTSTRAP_ITERATIONS = 1000;
+const MONTE_CARLO_BOOTSTRAP_ITERATIONS_MIN = 100;
+const MONTE_CARLO_BOOTSTRAP_ITERATIONS_MAX = 50_000;
+
+function resolveMonteCarloBootstrapIterations(requested?: number): number {
+  const n = requested ?? DEFAULT_MONTE_CARLO_BOOTSTRAP_ITERATIONS;
+  const floor = Math.floor(Number(n));
+  if (!Number.isFinite(floor)) return DEFAULT_MONTE_CARLO_BOOTSTRAP_ITERATIONS;
+  return Math.min(
+    MONTE_CARLO_BOOTSTRAP_ITERATIONS_MAX,
+    Math.max(MONTE_CARLO_BOOTSTRAP_ITERATIONS_MIN, floor),
+  );
+}
+
 const Z_SCORE_THRESHOLD = 2.0;
 const MIN_CURVE_POINTS = 5;
 const CHUNKS_COUNT = 4;
@@ -138,6 +154,8 @@ export interface ProfessionalMeta {
     hasPerformanceTransfer: boolean;
     hasValidationMaxDD: boolean;
     curvePointCount?: number;
+    /** Bootstrap resample count used for `monteCarloValidation` (window OOS returns). */
+    monteCarloBootstrapIterations?: number;
   };
   guardsTriggered: string[];
   approximationsUsed: string[];
@@ -495,20 +513,17 @@ function buildRegimeAnalysis(normalizedPeriods: NormalizedPeriod[]): RegimeAnaly
   };
 }
 
-/** Seeded RNG for deterministic bootstrap in tests. */
-function mulberry32(seed: number): () => number {
-  return function () {
-    let t = (seed += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t ^ (t >>> 15));
-    return (t >>> 0) / 4294967296;
-  };
-}
-
-function buildMonteCarloValidation(normalizedPeriods: NormalizedPeriod[], seed?: number): MonteCarloValidation {
+function buildMonteCarloValidation(
+  normalizedPeriods: NormalizedPeriod[],
+  seed?: number | null,
+  bootstrapIterations?: number,
+): MonteCarloValidation {
   const oosReturns = normalizedPeriods.map((p) => p.validationReturn).filter(Number.isFinite);
   const actualMeanReturn = oosReturns.length > 0 ? oosReturns.reduce((a, b) => a + b, 0) / oosReturns.length : 0;
-  const rng = seed != null ? mulberry32(seed) : Math.random;
+  const seedUsed =
+    seed != null && Number.isFinite(seed) ? seed : PATH_MONTE_CARLO_DEFAULT_SEED;
+  const rng = createMulberry32(seedUsed);
+  const iterations = resolveMonteCarloBootstrapIterations(bootstrapIterations);
   const bootstrapMeans: number[] = [];
   const n = oosReturns.length;
   if (n === 0) {
@@ -521,26 +536,26 @@ function buildMonteCarloValidation(normalizedPeriods: NormalizedPeriod[], seed?:
     };
   }
 
-  for (let iter = 0; iter < BOOTSTRAP_ITERATIONS; iter++) {
+  for (let iter = 0; iter < iterations; iter++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
       const idx = Math.floor(rng() * n);
-      sum += oosReturns[idx];
+      sum += oosReturns[idx]!;
     }
     bootstrapMeans.push(sum / n);
   }
 
   bootstrapMeans.sort((a, b) => a - b);
-  const ci95Low = bootstrapMeans[Math.floor(0.025 * bootstrapMeans.length)] ?? 0;
-  const ci95High = bootstrapMeans[Math.floor(0.975 * bootstrapMeans.length)] ?? 0;
-  const ci68Low = bootstrapMeans[Math.floor(0.16 * bootstrapMeans.length)] ?? 0;
-  const ci68High = bootstrapMeans[Math.floor(0.84 * bootstrapMeans.length)] ?? 0;
+  const ci95Low = percentileType7(bootstrapMeans, 0.025);
+  const ci95High = percentileType7(bootstrapMeans, 0.975);
+  const ci68Low = percentileType7(bootstrapMeans, 0.16);
+  const ci68High = percentileType7(bootstrapMeans, 0.84);
   const probabilityPositive = bootstrapMeans.filter((m) => m > 0).length / bootstrapMeans.length;
-  const zeroInCi = ci95Low <= 0 && ci95High >= 0;
+  const ci95ContainsZero = ci95Low <= 0 && ci95High >= 0;
 
   let verdict: MonteCarloValidation["verdict"] = "DOUBTFUL";
-  if (probabilityPositive >= 0.8 && !zeroInCi && actualMeanReturn > 0) verdict = "CONFIDENT";
-  else if (probabilityPositive >= 0.6 && actualMeanReturn > 0) verdict = "PROBABLE";
+  if (probabilityPositive >= 0.75 && !ci95ContainsZero) verdict = "CONFIDENT";
+  else if (probabilityPositive >= 0.6) verdict = "PROBABLE";
   else if (probabilityPositive >= 0.5) verdict = "UNCERTAIN";
 
   return {
@@ -729,10 +744,12 @@ function buildInstitutionalGrade(
  */
 export function buildProfessionalWfa(
   validation: ValidationResult,
-  options?: { seed?: number; permutationN?: number },
+  options?: { seed?: number; permutationN?: number; bootstrapN?: number },
 ): { professional: ProfessionalWfa; professionalMeta: ProfessionalMeta } | null {
   if (!validation.ok) return null;
   const { normalizedPeriods, normalizedCurves } = validation;
+
+  const bootstrapIterations = resolveMonteCarloBootstrapIterations(options?.bootstrapN);
 
   const meta: ProfessionalMeta = {
     version: PRO_WFA_VERSION,
@@ -744,6 +761,7 @@ export function buildProfessionalWfa(
         (p) => p.validationMaxDD != null && Number.isFinite(p.validationMaxDD),
       ),
       curvePointCount: normalizedCurves?.reduce((s, c) => s + c.length, 0),
+      monteCarloBootstrapIterations: bootstrapIterations,
     },
     guardsTriggered: [],
     approximationsUsed: [],
@@ -755,7 +773,11 @@ export function buildProfessionalWfa(
   const wfeAdvanced = buildWfeResult(is, oos, seedEff, options?.permutationN);
   const parameterStability = buildParameterStability(normalizedPeriods);
   const regimeAnalysis = buildRegimeAnalysis(normalizedPeriods);
-  const monteCarloValidation = buildMonteCarloValidation(normalizedPeriods, seedEff);
+  const monteCarloValidation = buildMonteCarloValidation(
+    normalizedPeriods,
+    seedEff,
+    bootstrapIterations,
+  );
   const stressTest = buildStressTest(normalizedPeriods, normalizedCurves, meta);
   const { grade, recommendation, institutionalGradeOverride } = buildInstitutionalGrade(
     equityCurveAnalysis,
@@ -884,7 +906,7 @@ function applyFailureRateInstitutionalGuard(
  */
 export function runProfessionalWfa(
   wfa: WfaProfessionalInput | null | undefined,
-  options?: { seed?: number; permutationN?: number },
+  options?: { seed?: number; permutationN?: number; bootstrapN?: number },
 ): { professional: ProfessionalWfa; professionalMeta: ProfessionalMeta } | null {
   const validation = validateAndNormalizeWfaInput(wfa);
   if (!validation.ok) return null;

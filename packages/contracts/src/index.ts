@@ -3,7 +3,7 @@
  * Keep these exports stable across minor releases.
  */
 
-export const ENGINE_VERSION = "0.1.0";
+export const ENGINE_VERSION = "0.2.0";
 export const ANALYSIS_ENGINE_VERSION = "3.0";
 export const FORMULA_VERSION = "2.2.0";
 export const RISK_ANALYSIS_VERSION = 1;
@@ -168,6 +168,18 @@ export type {
   InstitutionalGradeOverride,
   InstitutionalGradeOverrideCode,
 } from "./institutionalGradeOverride";
+
+export type {
+  DistributionStats,
+  MonteCarloPercentileSet,
+  PathMonteCarloBlock,
+  PathMonteCarloEquityPoint,
+  PathMonteCarloMeta,
+  PathMonteCarloOptions,
+  PathMonteCarloResult,
+  PathStability,
+  TailRisk,
+} from "./pathMonteCarlo";
 
 export type { IntegrationPayloadRaw, UnifiedIntegrationPayload } from "./unifiedPayload";
 export type {

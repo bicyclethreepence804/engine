@@ -66,6 +66,7 @@ See also **[`examples-map-payload-to-unified.md`](examples-map-payload-to-unifie
 | Basic analyze | `analyze()` | [`packages/contracts/src/analyzeContract.ts`](../packages/contracts/src/analyzeContract.ts) (`AnalyzeInput`, `AnalyzeOutput`) | `summary`, `metadata` (hashes, versions) | N/A |
 | WFA from trades | `analyzeFromTrades()` | [`packages/contracts/src/wfaAnalysisContract.ts`](../packages/contracts/src/wfaAnalysisContract.ts) (`TradeBasedWFAInput`, `WFAAnalysisOutput`) | Extends `AnalyzeOutput` with `wfe`, `consistency`, `warnings`, and `BlockResult` sections | See [`packages/contracts/src/errors.ts`](../packages/contracts/src/errors.ts) `KiploksUnavailableReason`: e.g. `parameterStability` often `parameters_not_provided`; `benchmark` often `equity_curve_not_provided`; `dqg` / `killSwitch` / `robustnessNarrative` often `*_not_in_public_wfa` in public WFA mode |
 | WFA from windows | `analyzeFromWindows()` | Same file (`PrecomputedWFAInput`, `WFAAnalysisOutput`) | Same family as row above | Same `BlockResult` rules; `parameters` on windows unlock parameter stability when data allows |
+| Path Monte Carlo (equity curve) | `buildPathMonteCarloSimulation()` | [`packages/contracts/src/pathMonteCarlo.ts`](../packages/contracts/src/pathMonteCarlo.ts) | Percentile bands, labels, `interpretation`, or `null` | **Not** part of `analyze*()` JSON; call separately. See [`MONTE_CARLO_PATH.md`](MONTE_CARLO_PATH.md). |
 | CSV to trades | `csvToTrades`, `csvToTradesFromStream` | [`packages/adapters`](../packages/adapters/README.md) | `Trade[]` for downstream calls | Stream: `maxTrades` cap (see adapter README) |
 | Normalize integration JSON | `mapPayloadToUnified()` | [`packages/contracts/src/unifiedPayload.ts`](../packages/contracts/src/unifiedPayload.ts) | `UnifiedIntegrationPayload` (normalized record) | Not a numeric engine; see warning above |
 
@@ -132,6 +133,17 @@ Minimal shape (two windows; `period` uses ISO date strings):
 
 Optional **`equityCurve`** on the input can help unlock benchmark-related paths when the contract and data allow it. Optional **`parameters`** per window feeds parameter stability when provided.
 
+### `AnalyzeConfig` (second argument to `analyze`, `analyzeFromTrades`, `analyzeFromWindows`)
+
+[`AnalyzeConfig`](../packages/contracts/src/analyzeContract.ts):
+
+| Field | Role |
+| ----- | ---- |
+| `seed` | Deterministic draws (permutations, professional blocks); default **42** where the engine applies a default. |
+| `decimals` | Rounding for profits and hashes (package default if omitted). |
+| `permutationN` | WFE permutation replicates (bounded in contracts, typically 100-10000). |
+| `monteCarloBootstrapN` | **Precomputed WFA only:** bootstrap iterations for professional `monteCarloValidation` (default **1000**, clamp **100-50000**). Ignored or N/A for `analyzeFromTrades` in current builds unless wired explicitly. |
+
 ---
 
 ## Troubleshooting: `available: false` and warnings
@@ -158,4 +170,5 @@ When contracts change, **this file can go stale**. Prefer:
 - **[`OPEN_CORE_INTEGRATION_PRINCIPLES.md`](OPEN_CORE_INTEGRATION_PRINCIPLES.md)** — design principles and `runEverything()`.  
 - **[`examples-map-payload-to-unified.md`](examples-map-payload-to-unified.md)** — `mapPayloadToUnified` and CSV-first flow.  
 - **[`examples/README.md`](examples/README.md)** — step-by-step examples.  
-- **[`ERROR_CATALOG.md`](ERROR_CATALOG.md)** — warning and error codes.
+- **[`ERROR_CATALOG.md`](ERROR_CATALOG.md)** — warning and error codes.  
+- **[`MONTE_CARLO_SIMULATION_IMPLEMENTATION.md`](MONTE_CARLO_SIMULATION_IMPLEMENTATION.md)** — path MC vs window bootstrap index.

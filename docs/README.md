@@ -21,11 +21,13 @@ Authoritative copies of engine-focused guides live **in this folder** so they sh
 | [`OSS_PUBLIC_REPO_SYNC.md`](OSS_PUBLIC_REPO_SYNC.md) | Repository layout, one `VERSION`, `sync-versions`, publish notes |
 | [`RELEASE_CHECKLIST.md`](../RELEASE_CHECKLIST.md) | Pre-release checks (tests, docs vs contracts) |
 | [`BOT_INTEGRATIONS.md`](BOT_INTEGRATIONS.md) | Freqtrade / OctoBot Python integrations (optional path without npm engine) |
+| [`MONTE_CARLO_SIMULATION_IMPLEMENTATION.md`](MONTE_CARLO_SIMULATION_IMPLEMENTATION.md) | **Monte Carlo index** — path MC vs professional window bootstrap, links to guides |
+| [`MONTE_CARLO_PATH.md`](MONTE_CARLO_PATH.md) | **Path-based Monte Carlo (user guide)** — `buildPathMonteCarloSimulation`, API, limits, reproducibility |
 
 ## TODO
 
-- **`monteCarloValidation`:** Current engine behavior is **bootstrap** over per-window OOS returns (see [`WFA_PROFESSIONAL.md`](WFA_PROFESSIONAL.md) §5). **Planned:** full Monte Carlo validation (design and versioning TBD). Repository root [`README.md`](../README.md) lists the same item.
+- **`monteCarloValidation`:** Current engine behavior is **bootstrap** over per-window OOS returns (see [`WFA_PROFESSIONAL.md`](WFA_PROFESSIONAL.md) §5). **Planned:** full Monte Carlo validation (design and versioning TBD). Repository root [`README.md`](../README.md) lists the same item. **Separate:** path-based equity bootstrap is [`MONTE_CARLO_PATH.md`](MONTE_CARLO_PATH.md) (`buildPathMonteCarloSimulation`).
 
 ## Examples
 
-See [`examples/README.md`](examples/README.md) (Markdown how-tos, [`result-layout-demo.html`](examples/result-layout-demo.html), and `sample-output/` JSON). For the methodology-style block chain (DQG through Final Verdict) mapped to engine source, see [`examples/10-methodology-flow-and-engine.md`](examples/10-methodology-flow-and-engine.md).
+See [`examples/README.md`](examples/README.md) (Markdown how-tos, [`result-layout-demo.html`](examples/result-layout-demo.html), and `sample-output/` JSON). Path MC: [`examples/monte-carlo-example.md`](examples/monte-carlo-example.md) and golden [`examples/monte-carlo-seed42.json`](examples/monte-carlo-seed42.json). For the methodology-style block chain (DQG through Final Verdict) mapped to engine source, see [`examples/10-methodology-flow-and-engine.md`](examples/10-methodology-flow-and-engine.md).

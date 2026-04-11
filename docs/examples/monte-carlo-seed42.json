@@ -1,0 +1,421 @@
+{
+  "description": "Golden fixture for packages/core/src/pathMonteCarlo.test.ts §8.6. Regenerate via npm run engine:examples:generate-monte-carlo-fixture after algorithm changes; bump PATH_MONTE_CARLO_METHOD_VERSION and CHANGELOG.",
+  "input": {
+    "equityPoints": [
+      {
+        "value": 100,
+        "timestamp": 0
+      },
+      {
+        "value": 101,
+        "timestamp": 86400000
+      },
+      {
+        "value": 102,
+        "timestamp": 172800000
+      },
+      {
+        "value": 103,
+        "timestamp": 259200000
+      },
+      {
+        "value": 104,
+        "timestamp": 345600000
+      },
+      {
+        "value": 105,
+        "timestamp": 432000000
+      },
+      {
+        "value": 106,
+        "timestamp": 518400000
+      },
+      {
+        "value": 107,
+        "timestamp": 604800000
+      },
+      {
+        "value": 108,
+        "timestamp": 691200000
+      },
+      {
+        "value": 109,
+        "timestamp": 777600000
+      },
+      {
+        "value": 110,
+        "timestamp": 864000000
+      },
+      {
+        "value": 111,
+        "timestamp": 950400000
+      },
+      {
+        "value": 112,
+        "timestamp": 1036800000
+      },
+      {
+        "value": 113,
+        "timestamp": 1123200000
+      },
+      {
+        "value": 114,
+        "timestamp": 1209600000
+      },
+      {
+        "value": 115,
+        "timestamp": 1296000000
+      },
+      {
+        "value": 116,
+        "timestamp": 1382400000
+      },
+      {
+        "value": 117,
+        "timestamp": 1468800000
+      },
+      {
+        "value": 118,
+        "timestamp": 1555200000
+      },
+      {
+        "value": 119,
+        "timestamp": 1641600000
+      },
+      {
+        "value": 120,
+        "timestamp": 1728000000
+      },
+      {
+        "value": 121,
+        "timestamp": 1814400000
+      },
+      {
+        "value": 122,
+        "timestamp": 1900800000
+      },
+      {
+        "value": 123,
+        "timestamp": 1987200000
+      },
+      {
+        "value": 124,
+        "timestamp": 2073600000
+      },
+      {
+        "value": 125,
+        "timestamp": 2160000000
+      },
+      {
+        "value": 126,
+        "timestamp": 2246400000
+      },
+      {
+        "value": 127,
+        "timestamp": 2332800000
+      },
+      {
+        "value": 128,
+        "timestamp": 2419200000
+      },
+      {
+        "value": 129,
+        "timestamp": 2505600000
+      },
+      {
+        "value": 130,
+        "timestamp": 2592000000
+      },
+      {
+        "value": 131,
+        "timestamp": 2678400000
+      },
+      {
+        "value": 132,
+        "timestamp": 2764800000
+      },
+      {
+        "value": 133,
+        "timestamp": 2851200000
+      },
+      {
+        "value": 134,
+        "timestamp": 2937600000
+      },
+      {
+        "value": 135,
+        "timestamp": 3024000000
+      },
+      {
+        "value": 136,
+        "timestamp": 3110400000
+      },
+      {
+        "value": 137,
+        "timestamp": 3196800000
+      },
+      {
+        "value": 138,
+        "timestamp": 3283200000
+      },
+      {
+        "value": 139,
+        "timestamp": 3369600000
+      },
+      {
+        "value": 140,
+        "timestamp": 3456000000
+      },
+      {
+        "value": 141,
+        "timestamp": 3542400000
+      },
+      {
+        "value": 142,
+        "timestamp": 3628800000
+      },
+      {
+        "value": 143,
+        "timestamp": 3715200000
+      },
+      {
+        "value": 144,
+        "timestamp": 3801600000
+      },
+      {
+        "value": 145,
+        "timestamp": 3888000000
+      },
+      {
+        "value": 146,
+        "timestamp": 3974400000
+      },
+      {
+        "value": 147,
+        "timestamp": 4060800000
+      },
+      {
+        "value": 148,
+        "timestamp": 4147200000
+      },
+      {
+        "value": 149,
+        "timestamp": 4233600000
+      },
+      {
+        "value": 150,
+        "timestamp": 4320000000
+      },
+      {
+        "value": 151,
+        "timestamp": 4406400000
+      },
+      {
+        "value": 152,
+        "timestamp": 4492800000
+      },
+      {
+        "value": 153,
+        "timestamp": 4579200000
+      },
+      {
+        "value": 154,
+        "timestamp": 4665600000
+      },
+      {
+        "value": 155,
+        "timestamp": 4752000000
+      },
+      {
+        "value": 156,
+        "timestamp": 4838400000
+      },
+      {
+        "value": 157,
+        "timestamp": 4924800000
+      },
+      {
+        "value": 158,
+        "timestamp": 5011200000
+      },
+      {
+        "value": 159,
+        "timestamp": 5097600000
+      },
+      {
+        "value": 160,
+        "timestamp": 5184000000
+      },
+      {
+        "value": 161,
+        "timestamp": 5270400000
+      },
+      {
+        "value": 162,
+        "timestamp": 5356800000
+      },
+      {
+        "value": 163,
+        "timestamp": 5443200000
+      },
+      {
+        "value": 164,
+        "timestamp": 5529600000
+      },
+      {
+        "value": 165,
+        "timestamp": 5616000000
+      },
+      {
+        "value": 166,
+        "timestamp": 5702400000
+      },
+      {
+        "value": 167,
+        "timestamp": 5788800000
+      },
+      {
+        "value": 168,
+        "timestamp": 5875200000
+      },
+      {
+        "value": 169,
+        "timestamp": 5961600000
+      },
+      {
+        "value": 170,
+        "timestamp": 6048000000
+      },
+      {
+        "value": 171,
+        "timestamp": 6134400000
+      },
+      {
+        "value": 172,
+        "timestamp": 6220800000
+      },
+      {
+        "value": 173,
+        "timestamp": 6307200000
+      },
+      {
+        "value": 174,
+        "timestamp": 6393600000
+      },
+      {
+        "value": 175,
+        "timestamp": 6480000000
+      },
+      {
+        "value": 176,
+        "timestamp": 6566400000
+      },
+      {
+        "value": 177,
+        "timestamp": 6652800000
+      },
+      {
+        "value": 178,
+        "timestamp": 6739200000
+      },
+      {
+        "value": 179,
+        "timestamp": 6825600000
+      },
+      {
+        "value": 180,
+        "timestamp": 6912000000
+      },
+      {
+        "value": 181,
+        "timestamp": 6998400000
+      },
+      {
+        "value": 182,
+        "timestamp": 7084800000
+      },
+      {
+        "value": 183,
+        "timestamp": 7171200000
+      },
+      {
+        "value": 184,
+        "timestamp": 7257600000
+      },
+      {
+        "value": 185,
+        "timestamp": 7344000000
+      },
+      {
+        "value": 186,
+        "timestamp": 7430400000
+      },
+      {
+        "value": 187,
+        "timestamp": 7516800000
+      },
+      {
+        "value": 188,
+        "timestamp": 7603200000
+      },
+      {
+        "value": 189,
+        "timestamp": 7689600000
+      },
+      {
+        "value": 190,
+        "timestamp": 7776000000
+      },
+      {
+        "value": 191,
+        "timestamp": 7862400000
+      },
+      {
+        "value": 192,
+        "timestamp": 7948800000
+      },
+      {
+        "value": 193,
+        "timestamp": 8035200000
+      },
+      {
+        "value": 194,
+        "timestamp": 8121600000
+      },
+      {
+        "value": 195,
+        "timestamp": 8208000000
+      },
+      {
+        "value": 196,
+        "timestamp": 8294400000
+      },
+      {
+        "value": 197,
+        "timestamp": 8380800000
+      },
+      {
+        "value": 198,
+        "timestamp": 8467200000
+      },
+      {
+        "value": 199,
+        "timestamp": 8553600000
+      }
+    ],
+    "options": {
+      "seed": 42,
+      "simulations": 1000,
+      "minPeriods": 10,
+      "horizonYears": 1
+    }
+  },
+  "expected": {
+    "cagrDistribution": {
+      "p50": 0.990289145741809
+    },
+    "meta": {
+      "simulationsRun": 1000
+    }
+  }
+}
