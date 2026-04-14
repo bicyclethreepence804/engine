@@ -3,7 +3,7 @@
  * Keep these exports stable across minor releases.
  */
 
-export const ENGINE_VERSION = "0.2.0";
+export const ENGINE_VERSION = "0.3.0";
 export const ANALYSIS_ENGINE_VERSION = "3.0";
 export const FORMULA_VERSION = "2.2.0";
 export const RISK_ANALYSIS_VERSION = 1;
@@ -162,6 +162,13 @@ export type WfaProfessionalInput = {
 
 export type WfaProfessionalOptions = {
   seed?: number;
+  permutationN?: number;
+  bootstrapN?: number;
+  monteCarloMode?: "legacy" | "auto" | "new_only";
+  enablePathMc?: boolean;
+  pathSimulations?: number;
+  maxEquityPoints?: number;
+  cpuBudgetMs?: number;
 };
 
 export type {
@@ -186,6 +193,11 @@ export type {
   RobustnessScoreTextPayload,
   RobustnessScore,
   WalkForwardAnalysisTextPayload,
+  ProfessionalMonteCarloMethod,
+  ProfessionalMonteCarloReasonCode,
+  ProfessionalMonteCarloValidation,
+  ProfessionalWfa,
+  ProfessionalMeta,
   WalkForwardAnalysis,
   TestResultData,
 } from "./testResultData";

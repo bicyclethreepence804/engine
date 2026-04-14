@@ -18,6 +18,7 @@ import {
 } from "@kiploks/engine-contracts";
 import { percentileType7 } from "./percentile";
 import { PATH_MONTE_CARLO_DEFAULT_SEED } from "./pathMonteCarloConstants";
+import { buildPathMonteCarloSimulation } from "./pathMonteCarlo";
 import { createMulberry32 } from "./prng";
 import { buildWfeResult } from "./wfa/wfeCalculator";
 import {
@@ -28,6 +29,11 @@ import {
 const DEFAULT_MONTE_CARLO_BOOTSTRAP_ITERATIONS = 1000;
 const MONTE_CARLO_BOOTSTRAP_ITERATIONS_MIN = 100;
 const MONTE_CARLO_BOOTSTRAP_ITERATIONS_MAX = 50_000;
+const PROFESSIONAL_MC_MIN_WINDOWS = 3;
+const PROFESSIONAL_MC_MIN_CURVE_POINTS = 30;
+const PROFESSIONAL_MC_MIN_YEARS = 0.25;
+const PROFESSIONAL_MC_MAX_PATH_SIMULATIONS = 5_000;
+const PROFESSIONAL_MC_MAX_EQUITY_POINTS = 500;
 
 function resolveMonteCarloBootstrapIterations(requested?: number): number {
   const n = requested ?? DEFAULT_MONTE_CARLO_BOOTSTRAP_ITERATIONS;
@@ -103,11 +109,111 @@ export interface RegimeAnalysis {
 }
 
 export interface MonteCarloValidation {
+  method?:
+    | "path_mc_v1"
+    | "window_iid_bootstrap"
+    | "unavailable"
+    | "window_iid_bootstrap_legacy_snapshot";
+  version?: string;
+  iterations?: number;
+  seed?: number;
+  reasonCode?:
+    | "insufficient_windows"
+    | "missing_equity_curve"
+    | "insufficient_curve_points"
+    | "insufficient_curve_span"
+    | "flat_equity"
+    | "cpu_budget_exceeded";
+  warnings?: string[];
   actualMeanReturn: number;
   confidenceInterval95: [number, number];
   confidenceInterval68: [number, number];
   probabilityPositive: number;
   verdict: "CONFIDENT" | "PROBABLE" | "UNCERTAIN" | "DOUBTFUL";
+}
+
+type MonteCarloMethodSelection = {
+  method: "path_mc_v1" | "window_iid_bootstrap" | "unavailable";
+  reasonCode?: MonteCarloValidation["reasonCode"];
+};
+
+function parseDateLikeToMs(value: string): number | null {
+  if (!value) return null;
+  const n = Number(value);
+  if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function buildPathMcPointsFromCurves(
+  normalizedCurves?: Array<{ date: string; value: number }[]>,
+): Array<{ timestamp: number; value: number }> {
+  if (!normalizedCurves || normalizedCurves.length === 0) return [];
+  const out: Array<{ timestamp: number; value: number }> = [];
+  for (const curve of normalizedCurves) {
+    for (const p of curve) {
+      const ts = parseDateLikeToMs(p.date);
+      if (ts == null || !Number.isFinite(p.value) || p.value <= 0) continue;
+      out.push({ timestamp: ts, value: p.value });
+    }
+  }
+  out.sort((a, b) => a.timestamp - b.timestamp);
+  const dedup = new Map<number, number>();
+  for (const p of out) dedup.set(p.timestamp, p.value);
+  return [...dedup.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([timestamp, value]) => ({ timestamp, value }));
+}
+
+function decimatePoints<T>(points: T[], maxPoints: number): T[] {
+  if (points.length <= maxPoints) return points;
+  if (maxPoints <= 2) return [points[0], points[points.length - 1]];
+  const out: T[] = [];
+  const step = (points.length - 1) / (maxPoints - 1);
+  for (let i = 0; i < maxPoints; i++) {
+    out.push(points[Math.round(i * step)]!);
+  }
+  return out;
+}
+
+function selectMonteCarloMethod(
+  normalizedPeriods: NormalizedPeriod[],
+  normalizedCurves: Array<{ date: string; value: number }[]> | undefined,
+  options?: {
+    monteCarloMode?: "legacy" | "auto" | "new_only";
+    enablePathMc?: boolean;
+  },
+): MonteCarloMethodSelection {
+  const mode = options?.monteCarloMode ?? "auto";
+  const pathEnabled = options?.enablePathMc === true;
+
+  const tryPath = mode === "new_only" || (mode === "auto" && pathEnabled);
+  if (tryPath) {
+    const points = buildPathMcPointsFromCurves(normalizedCurves);
+    if (points.length < PROFESSIONAL_MC_MIN_CURVE_POINTS) {
+      return {
+        method: mode === "new_only" ? "unavailable" : "window_iid_bootstrap",
+        reasonCode: points.length === 0 ? "missing_equity_curve" : "insufficient_curve_points",
+      };
+    }
+    const years =
+      points.length >= 2
+        ? (points[points.length - 1]!.timestamp - points[0]!.timestamp) /
+          (365.25 * 24 * 60 * 60 * 1000)
+        : 0;
+    if (!(years >= PROFESSIONAL_MC_MIN_YEARS)) {
+      return {
+        method: mode === "new_only" ? "unavailable" : "window_iid_bootstrap",
+        reasonCode: "insufficient_curve_span",
+      };
+    }
+    return { method: "path_mc_v1" };
+  }
+
+  if (normalizedPeriods.length >= PROFESSIONAL_MC_MIN_WINDOWS) {
+    return { method: "window_iid_bootstrap" };
+  }
+  return { method: "unavailable", reasonCode: "insufficient_windows" };
 }
 
 export interface StressTest {
@@ -515,9 +621,120 @@ function buildRegimeAnalysis(normalizedPeriods: NormalizedPeriod[]): RegimeAnaly
 
 function buildMonteCarloValidation(
   normalizedPeriods: NormalizedPeriod[],
+  normalizedCurves: Array<{ date: string; value: number }[]> | undefined,
   seed?: number | null,
   bootstrapIterations?: number,
+  options?: {
+    monteCarloMode?: "legacy" | "auto" | "new_only";
+    enablePathMc?: boolean;
+    pathSimulations?: number;
+    maxEquityPoints?: number;
+    cpuBudgetMs?: number;
+  },
 ): MonteCarloValidation {
+  const selected = selectMonteCarloMethod(normalizedPeriods, normalizedCurves, options);
+  if (selected.method === "path_mc_v1") {
+    const pointsRaw = buildPathMcPointsFromCurves(normalizedCurves);
+    const maxPoints = Math.max(
+      2,
+      Math.floor(options?.maxEquityPoints ?? PROFESSIONAL_MC_MAX_EQUITY_POINTS),
+    );
+    const points = decimatePoints(pointsRaw, maxPoints);
+    const sims = Math.min(
+      PROFESSIONAL_MC_MAX_PATH_SIMULATIONS,
+      Math.max(100, Math.floor(options?.pathSimulations ?? 1_000)),
+    );
+    const budgetMs = options?.cpuBudgetMs ?? 300;
+    const estimatedCost = points.length * sims;
+    if (estimatedCost > 2_500_000) {
+      return {
+        method: "unavailable",
+        version: "mc-v1",
+        iterations: sims,
+        seed: seed ?? PATH_MONTE_CARLO_DEFAULT_SEED,
+        reasonCode: "cpu_budget_exceeded",
+        actualMeanReturn: 0,
+        confidenceInterval95: [0, 0],
+        confidenceInterval68: [0, 0],
+        probabilityPositive: 0,
+        verdict: "DOUBTFUL",
+      };
+    }
+    const started = Date.now();
+    const path = buildPathMonteCarloSimulation(
+      points.map((p) => ({ timestamp: p.timestamp, value: p.value })),
+      {
+        seed: seed ?? PATH_MONTE_CARLO_DEFAULT_SEED,
+        simulations: sims,
+        minPeriods: PROFESSIONAL_MC_MIN_CURVE_POINTS,
+      },
+    );
+    if (Date.now() - started > budgetMs) {
+      return {
+        method: "unavailable",
+        version: "mc-v1",
+        iterations: sims,
+        seed: seed ?? PATH_MONTE_CARLO_DEFAULT_SEED,
+        reasonCode: "cpu_budget_exceeded",
+        actualMeanReturn: 0,
+        confidenceInterval95: [0, 0],
+        confidenceInterval68: [0, 0],
+        probabilityPositive: 0,
+        verdict: "DOUBTFUL",
+      };
+    }
+    if (!path) {
+      return {
+        method: "unavailable",
+        version: "mc-v1",
+        iterations: sims,
+        seed: seed ?? PATH_MONTE_CARLO_DEFAULT_SEED,
+        reasonCode: "flat_equity",
+        actualMeanReturn: 0,
+        confidenceInterval95: [0, 0],
+        confidenceInterval68: [0, 0],
+        probabilityPositive: 0,
+        verdict: "DOUBTFUL",
+      };
+    }
+    const probabilityPositive = path.probabilityPositive;
+    const ci95: [number, number] = [path.cagrDistribution.p5, path.cagrDistribution.p95];
+    const ci68: [number, number] = [path.cagrDistribution.p25, path.cagrDistribution.p75];
+    const ci95ContainsZero = ci95[0] <= 0 && ci95[1] >= 0;
+    let verdict: MonteCarloValidation["verdict"] = "DOUBTFUL";
+    if (probabilityPositive >= 0.75 && !ci95ContainsZero) verdict = "CONFIDENT";
+    else if (probabilityPositive >= 0.6) verdict = "PROBABLE";
+    else if (probabilityPositive >= 0.5) verdict = "UNCERTAIN";
+    return {
+      method: "path_mc_v1",
+      version: `mc-v1/path-${path.meta.methodVersion}`,
+      iterations: path.meta.simulationsRun,
+      seed: path.meta.seedUsed,
+      warnings: path.meta.approximationsUsed ?? [],
+      actualMeanReturn: path.cagrStats.mean,
+      confidenceInterval95: ci95,
+      confidenceInterval68: ci68,
+      probabilityPositive: Math.round(probabilityPositive * 1000) / 1000,
+      verdict,
+    };
+  }
+  if (selected.method === "unavailable") {
+    const seedUsed = seed != null && Number.isFinite(seed) ? seed : PATH_MONTE_CARLO_DEFAULT_SEED;
+    const iterations = resolveMonteCarloBootstrapIterations(bootstrapIterations);
+    return {
+      method: "unavailable",
+      version: "mc-v1",
+      iterations,
+      seed: seedUsed,
+      reasonCode: selected.reasonCode ?? "insufficient_windows",
+      actualMeanReturn: 0,
+      confidenceInterval95: [0, 0],
+      confidenceInterval68: [0, 0],
+      probabilityPositive: 0,
+      verdict: "DOUBTFUL",
+    };
+  }
+
   const oosReturns = normalizedPeriods.map((p) => p.validationReturn).filter(Number.isFinite);
   const actualMeanReturn = oosReturns.length > 0 ? oosReturns.reduce((a, b) => a + b, 0) / oosReturns.length : 0;
   const seedUsed =
@@ -526,8 +743,13 @@ function buildMonteCarloValidation(
   const iterations = resolveMonteCarloBootstrapIterations(bootstrapIterations);
   const bootstrapMeans: number[] = [];
   const n = oosReturns.length;
-  if (n === 0) {
+  if (n < PROFESSIONAL_MC_MIN_WINDOWS) {
     return {
+      method: "unavailable",
+      version: "mc-v1",
+      iterations,
+      seed: seedUsed,
+      reasonCode: selected.reasonCode ?? "insufficient_windows",
       actualMeanReturn: 0,
       confidenceInterval95: [0, 0],
       confidenceInterval68: [0, 0],
@@ -559,6 +781,10 @@ function buildMonteCarloValidation(
   else if (probabilityPositive >= 0.5) verdict = "UNCERTAIN";
 
   return {
+    method: "window_iid_bootstrap",
+    version: "mc-v1",
+    iterations,
+    seed: seedUsed,
     actualMeanReturn,
     confidenceInterval95: [ci95Low, ci95High],
     confidenceInterval68: [ci68Low, ci68High],
@@ -697,6 +923,9 @@ function buildInstitutionalGrade(
     monteCarloValidation.verdict,
     stressTest.verdict,
   );
+  if (monteCarloValidation.method === "unavailable") {
+    scores.monteCarlo = 50;
+  }
   const composite = scores.wfe * 0.35 + scores.monteCarlo * 0.25 + scores.equity * 0.15 + scores.param * 0.1 + scores.regime * 0.1 + scores.stress * 0.05;
 
   let grade: InstitutionalGrade = "BBB - RESEARCH ONLY";
@@ -744,7 +973,16 @@ function buildInstitutionalGrade(
  */
 export function buildProfessionalWfa(
   validation: ValidationResult,
-  options?: { seed?: number; permutationN?: number; bootstrapN?: number },
+  options?: {
+    seed?: number;
+    permutationN?: number;
+    bootstrapN?: number;
+    monteCarloMode?: "legacy" | "auto" | "new_only";
+    enablePathMc?: boolean;
+    pathSimulations?: number;
+    maxEquityPoints?: number;
+    cpuBudgetMs?: number;
+  },
 ): { professional: ProfessionalWfa; professionalMeta: ProfessionalMeta } | null {
   if (!validation.ok) return null;
   const { normalizedPeriods, normalizedCurves } = validation;
@@ -775,9 +1013,17 @@ export function buildProfessionalWfa(
   const regimeAnalysis = buildRegimeAnalysis(normalizedPeriods);
   const monteCarloValidation = buildMonteCarloValidation(
     normalizedPeriods,
+    normalizedCurves,
     seedEff,
     bootstrapIterations,
+    options,
   );
+  if (monteCarloValidation.method === "unavailable") {
+    meta.approximationsUsed.push("mc_unavailable_neutral_score_50");
+    meta.approximationsUsed.push(
+      `mc_unavailable_reason:${monteCarloValidation.reasonCode ?? "unknown"}`,
+    );
+  }
   const stressTest = buildStressTest(normalizedPeriods, normalizedCurves, meta);
   const { grade, recommendation, institutionalGradeOverride } = buildInstitutionalGrade(
     equityCurveAnalysis,
@@ -906,7 +1152,16 @@ function applyFailureRateInstitutionalGuard(
  */
 export function runProfessionalWfa(
   wfa: WfaProfessionalInput | null | undefined,
-  options?: { seed?: number; permutationN?: number; bootstrapN?: number },
+  options?: {
+    seed?: number;
+    permutationN?: number;
+    bootstrapN?: number;
+    monteCarloMode?: "legacy" | "auto" | "new_only";
+    enablePathMc?: boolean;
+    pathSimulations?: number;
+    maxEquityPoints?: number;
+    cpuBudgetMs?: number;
+  },
 ): { professional: ProfessionalWfa; professionalMeta: ProfessionalMeta } | null {
   const validation = validateAndNormalizeWfaInput(wfa);
   if (!validation.ok) return null;

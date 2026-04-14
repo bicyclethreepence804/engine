@@ -40,6 +40,61 @@ export interface WalkForwardAnalysisTextPayload {
   verdictExplanation?: string;
 }
 
+export type ProfessionalMonteCarloMethod =
+  | "path_mc_v1"
+  | "window_iid_bootstrap"
+  | "unavailable"
+  | "window_iid_bootstrap_legacy_snapshot";
+
+export type ProfessionalMonteCarloReasonCode =
+  | "insufficient_windows"
+  | "missing_equity_curve"
+  | "insufficient_curve_points"
+  | "insufficient_curve_span"
+  | "flat_equity"
+  | "cpu_budget_exceeded";
+
+export interface ProfessionalMonteCarloValidation {
+  method?: ProfessionalMonteCarloMethod;
+  version?: string;
+  iterations?: number;
+  seed?: number;
+  reasonCode?: ProfessionalMonteCarloReasonCode;
+  warnings?: string[];
+  actualMeanReturn?: number;
+  confidenceInterval95?: [number, number];
+  confidenceInterval68?: [number, number];
+  probabilityPositive?: number;
+  verdict?: "CONFIDENT" | "PROBABLE" | "UNCERTAIN" | "DOUBTFUL";
+}
+
+export interface ProfessionalWfa {
+  equityCurveAnalysis?: unknown;
+  wfeAdvanced?: unknown;
+  parameterStability?: unknown;
+  regimeAnalysis?: unknown;
+  monteCarloValidation?: ProfessionalMonteCarloValidation;
+  stressTest?: unknown;
+  institutionalGrade?: string;
+  institutionalGradeOverride?: unknown;
+  institutionalGradeOverrideReason?: string;
+  recommendation?: string;
+}
+
+export interface ProfessionalMeta {
+  version: string;
+  engineFormulaVersion?: string;
+  inputsSummary: {
+    periodCount: number;
+    hasPerformanceTransfer: boolean;
+    hasValidationMaxDD: boolean;
+    curvePointCount?: number;
+    monteCarloBootstrapIterations?: number;
+  };
+  guardsTriggered: string[];
+  approximationsUsed: string[];
+}
+
 export interface WalkForwardAnalysis {
   performanceTransfer: { windows: unknown[] };
   wfe?: number;
@@ -59,8 +114,8 @@ export interface WalkForwardAnalysis {
   isDisabled?: boolean;
   textPayload?: WalkForwardAnalysisTextPayload;
   /** Core can enrich these fields with professional block structures. */
-  professional?: unknown;
-  professionalMeta?: unknown;
+  professional?: ProfessionalWfa;
+  professionalMeta?: ProfessionalMeta;
 }
 
 export interface TestResultData {

@@ -1,6 +1,6 @@
 {
   "name": "@kiploks/engine-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -42,12 +42,19 @@
       },
       "types": "./dist/internal.d.ts",
       "default": "./dist/internal.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
     }
   },
   "typesVersions": {
     "*": {
       "internal": [
         "dist/internal.d.ts"
+      ],
+      "server": [
+        "dist/server.d.ts"
       ]
     }
   },
@@ -62,7 +69,7 @@
     "postpack": "node ../../scripts/engine-core-prepack.mjs restore"
   },
   "dependencies": {
-    "@kiploks/engine-contracts": "0.2.0"
+    "@kiploks/engine-contracts": "0.3.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
