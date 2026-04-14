@@ -1,6 +1,6 @@
 {
   "name": "@kiploks/engine-contracts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -12,6 +12,22 @@
   "bugs": {
     "url": "https://github.com/kiploks/engine/issues"
   },
+  "keywords": [
+    "algorithmic-trading",
+    "walk-forward-analysis",
+    "wfa",
+    "backtest",
+    "backtest-validation",
+    "trading-strategy",
+    "quantitative-finance",
+    "typescript",
+    "kiploks",
+    "open-core",
+    "risk-metrics",
+    "reproducible-analytics",
+    "out-of-sample",
+    "trading-research"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

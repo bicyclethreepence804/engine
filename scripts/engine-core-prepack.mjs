@@ -1,6 +1,8 @@
 /**
  * npm lifecycle for @kiploks/engine-core:
- * - prepack "strip": remove ./internal from exports (and typesVersions.internal) so npm tarballs cannot resolve internal.
+ * - prepack "strip": remove ./internal from exports (and typesVersions.internal) and drop dist/internal.*
+ *   so npm consumers cannot import @kiploks/engine-core/internal. The published ./server entry stays
+ *   (self-contained dist/server.js that does not depend on dist/internal.js).
  * - postpack "restore": restore package.json from backup.
  *
  * Lives under the engine repo root so a public Open Core checkout is self-contained.

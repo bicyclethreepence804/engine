@@ -107,6 +107,8 @@ Key fields:
 
 **What it does not do:** No path-dependent simulation (no synthetic full equity curves drawn step-by-step, no shock model over returns beyond window resampling, no strategy-path Monte Carlo).
 
+**`monteCarloMode` / `enablePathMc` (optional):** In addition to window bootstrap above, the professional pipeline may emit **`method: "path_mc_v1"`** (path simulation from stored equity curves) or **`method: "unavailable"`** with a **`reasonCode`**, depending on mode, `enablePathMc`, and data eligibility. See [**MONTE_CARLO_PATH.md**](./MONTE_CARLO_PATH.md) and `wfaProfessional.ts` / `wfaProfessional.test.ts` for selection rules. When path MC cannot run, institutional grade aggregation still needs a bounded MC signal: the engine applies a **neutral Monte Carlo contribution** and records **`mc_unavailable_neutral_score_50`** plus **`mc_unavailable_reason:*`** entries in **`professionalMeta.approximationsUsed`**.
+
 Key fields:
 
 - `actualMeanReturn: number`

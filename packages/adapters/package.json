@@ -1,6 +1,6 @@
 {
   "name": "@kiploks/engine-adapters",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publishConfig": {
     "access": "public"
   },
@@ -12,6 +12,22 @@
   "bugs": {
     "url": "https://github.com/kiploks/engine/issues"
   },
+  "keywords": [
+    "algorithmic-trading",
+    "walk-forward-analysis",
+    "wfa",
+    "backtest",
+    "backtest-validation",
+    "trading-strategy",
+    "quantitative-finance",
+    "typescript",
+    "kiploks",
+    "open-core",
+    "risk-metrics",
+    "reproducible-analytics",
+    "out-of-sample",
+    "trading-research"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -29,7 +45,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@kiploks/engine-contracts": "0.2.0"
+    "@kiploks/engine-contracts": "0.3.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

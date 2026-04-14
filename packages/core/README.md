@@ -31,7 +31,9 @@ Results are **deterministic** for a given input, config, and published version. 
 
 ## API policy
 
-Use the **root** import `from "@kiploks/engine-core"` only. That is the supported, semver-stable surface on npm. A separate `./internal` path may exist in the **git** tree for in-repo tooling and tests; it is **not** published in the package tarball (`prepack` removes it).
+- **Browser / integrators:** `import { … } from "@kiploks/engine-core"` — stable, documented surface.
+- **Node / hosted backends (full report assembly):** `import { … } from "@kiploks/engine-core/server"` — semver-stable **subpath** on npm. Do not use this from frontend bundles.
+- The legacy `./internal` entry is stripped from published `package.json` (`prepack`); prefer `./server` for server-side code.
 
 ## License
 

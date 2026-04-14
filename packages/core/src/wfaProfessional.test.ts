@@ -362,4 +362,198 @@ describe("wfaProfessional", () => {
     );
     expect(out?.professionalMeta.inputsSummary.monteCarloBootstrapIterations).toBe(200);
   });
+
+  it("keeps auto mode on window bootstrap by default (path flag disabled)", () => {
+    const baseTs = Date.UTC(2024, 0, 1);
+    const curve = Array.from({ length: 120 }, (_, i) => ({
+      date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+      value: 1 + i * 0.001,
+    }));
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+        performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+      } as never,
+      { seed: 42, monteCarloMode: "auto" },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("window_iid_bootstrap");
+  });
+
+  it("selects path_mc_v1 when path flag is enabled and curve is eligible", () => {
+    const baseTs = Date.UTC(2024, 0, 1);
+    const curve = Array.from({ length: 120 }, (_, i) => ({
+      date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+      value: 1 + i * 0.001 + (i % 7 === 0 ? 0.002 : 0),
+    }));
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+        performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+      } as never,
+      { seed: 42, monteCarloMode: "auto", enablePathMc: true, pathSimulations: 500 },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("path_mc_v1");
+  });
+
+  it("returns unavailable with reason in new_only mode when path inputs are missing", () => {
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+      } as never,
+      { seed: 42, monteCarloMode: "new_only", enablePathMc: true },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("unavailable");
+    expect(out?.professional.monteCarloValidation?.reasonCode).toBe("missing_equity_curve");
+    expect(out?.professionalMeta.approximationsUsed).toContain("mc_unavailable_neutral_score_50");
+    expect(out?.professionalMeta.approximationsUsed).toContain(
+      "mc_unavailable_reason:missing_equity_curve",
+    );
+  });
+
+  it("does not append mc unavailable approximations when window bootstrap is used", () => {
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+      } as never,
+      { seed: 42, monteCarloMode: "auto" },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("window_iid_bootstrap");
+    expect(out?.professionalMeta.approximationsUsed).not.toContain("mc_unavailable_neutral_score_50");
+  });
+
+  it("returns unavailable cpu_budget_exceeded when estimated path cost exceeds cap", () => {
+    const baseTs = Date.UTC(2024, 0, 1);
+    const curve = Array.from({ length: 600 }, (_, i) => ({
+      date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+      value: 1 + i * 0.0001 + (i % 5 === 0 ? 0.0002 : 0),
+    }));
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+        performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+      } as never,
+      {
+        seed: 42,
+        monteCarloMode: "auto",
+        enablePathMc: true,
+        maxEquityPoints: 501,
+        pathSimulations: 5000,
+      },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("unavailable");
+    expect(out?.professional.monteCarloValidation?.reasonCode).toBe("cpu_budget_exceeded");
+  });
+
+  it("returns unavailable cpu_budget_exceeded when runtime exceeds cpuBudgetMs", () => {
+    const baseTs = Date.UTC(2024, 0, 1);
+    const curve = Array.from({ length: 120 }, (_, i) => ({
+      date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+      value: 1 + i * 0.001 + (i % 7 === 0 ? 0.002 : 0),
+    }));
+    const out = runProfessionalWfa(
+      {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+        performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+      } as never,
+      {
+        seed: 42,
+        monteCarloMode: "auto",
+        enablePathMc: true,
+        pathSimulations: 5000,
+        cpuBudgetMs: 0,
+      },
+    );
+    expect(out?.professional.monteCarloValidation?.method).toBe("unavailable");
+    expect(out?.professional.monteCarloValidation?.reasonCode).toBe("cpu_budget_exceeded");
+  });
+
+  it.each([
+    ["legacy", { monteCarloMode: "legacy" as const, enablePathMc: true }, "window_iid_bootstrap"],
+    ["auto path off + curve", { monteCarloMode: "auto" as const, enablePathMc: false }, "window_iid_bootstrap"],
+    ["auto path on + curve", { monteCarloMode: "auto" as const, enablePathMc: true }, "path_mc_v1"],
+  ] as const)(
+    "MC selector matrix row %s",
+    (_label, opts, expectedMethod) => {
+      const baseTs = Date.UTC(2024, 0, 1);
+      const curve = Array.from({ length: 120 }, (_, i) => ({
+        date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+        value: 1 + i * 0.001 + (i % 7 === 0 ? 0.002 : 0),
+      }));
+      const wfa = {
+        periods: [
+          { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+          { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+          { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+        ],
+        performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+      } as never;
+      const out = runProfessionalWfa(wfa, { seed: 42, pathSimulations: 500, ...opts });
+      expect(out?.professional.monteCarloValidation?.method).toBe(expectedMethod);
+    },
+  );
+
+  it("monteCarloValidation.method is always a known contract method when present", () => {
+    const allowed = new Set([
+      "path_mc_v1",
+      "window_iid_bootstrap",
+      "unavailable",
+      "window_iid_bootstrap_legacy_snapshot",
+    ]);
+    const baseTs = Date.UTC(2024, 0, 1);
+    const curve = Array.from({ length: 40 }, (_, i) => ({
+      date: new Date(baseTs + i * 24 * 60 * 60 * 1000).toISOString(),
+      value: 1 + i * 0.001,
+    }));
+    const variants = [
+      runProfessionalWfa(
+        {
+          periods: [
+            { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+            { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+            { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+          ],
+        } as never,
+        { seed: 1, monteCarloMode: "auto" },
+      ),
+      runProfessionalWfa(
+        {
+          periods: [
+            { optimizationReturn: 0.1, validationReturn: 0.05, parameters: { p: 1 } },
+            { optimizationReturn: 0.12, validationReturn: 0.04, parameters: { p: 2 } },
+            { optimizationReturn: 0.09, validationReturn: 0.06, parameters: { p: 3 } },
+          ],
+          performanceTransfer: { windows: [{ oosEquityCurve: curve }] },
+        } as never,
+        { seed: 1, monteCarloMode: "auto", enablePathMc: true },
+      ),
+    ];
+    for (const out of variants) {
+      const m = out?.professional.monteCarloValidation?.method;
+      if (m) expect(allowed.has(m)).toBe(true);
+    }
+  });
 });
