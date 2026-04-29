@@ -1,4 +1,4 @@
-# Kiploks Engine (Open Core)
+# Kiploks Trading Robustness Engine (Open Core)
 
 ## ✨ New: easier Freqtrade bot testing in UI
 
