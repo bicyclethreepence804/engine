@@ -249,7 +249,7 @@ export function useOrchestratorApp() {
       const next = d as KiploksUiState;
       setKiploksUi(next);
       setKiploksUiBaseline(normalizeKiploksDraft(next));
-    } catch (_) {
+    } catch {
       setKiploksUi(null);
       setKiploksUiBaseline(null);
     }
@@ -468,7 +468,6 @@ export function useOrchestratorApp() {
       if (timerReports != null) clearInterval(timerReports);
       clearInterval(timerCloudLinks);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- initial load + polling only
   }, []);
 
   /** Shell remounts legacy on each step; refresh preflight so Run Integration gate matches Preparation. */
@@ -497,7 +496,7 @@ export function useOrchestratorApp() {
   useEffect(() => {
     try {
       window.localStorage.setItem(WORKFLOW_KEY, workflowType);
-    } catch (_) {
+    } catch {
       /* ignore */
     }
   }, [workflowType]);
@@ -538,7 +537,6 @@ export function useOrchestratorApp() {
     es.addEventListener("ready", () => undefined);
     es.onerror = () => undefined;
     return () => es.close();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshJobs is stable enough for polling
   }, [selectedJobId]);
 
   useEffect(() => {
@@ -549,19 +547,16 @@ export function useOrchestratorApp() {
 
   useEffect(() => {
     void loadKiploksConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCsvFlow, integration, paths]);
 
   useEffect(() => {
     void refreshBacktestArtifacts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCsvFlow, integration, paths]);
 
   useEffect(() => {
     if (isCsvFlow || integration !== "freqtrade" || !hasPathForIntegration) return;
     const id = window.setInterval(() => void refreshBacktestArtifacts({ silent: true }), 10000);
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCsvFlow, integration, hasPathForIntegration]);
 
   return {

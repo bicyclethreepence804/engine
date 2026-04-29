@@ -1,4 +1,5 @@
 /* Large legacy view: strict report DTO types - incremental follow-up. */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { json } from "./json";
@@ -341,7 +342,9 @@ export function ReportDetails({ reportId }: { reportId: string }) {
         try {
           const s = JSON.stringify(v);
           out.push([k, s.length > 220 ? s.slice(0, 220) + "…" : s]);
-        } catch (_) {}
+        } catch {
+          out.push([k, "[object]"]);
+        }
       }
     }
     return out;
