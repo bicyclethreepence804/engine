@@ -1,6 +1,6 @@
 # @kiploks/engine-test-vectors
 
-## New: easier Freqtrade bot testing in UI
+## ✨ New: easier Freqtrade bot testing in UI
 
 You can now run Freqtrade bot tests directly from the web interface with much less setup friction.
 
