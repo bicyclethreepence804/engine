@@ -6,6 +6,12 @@ You can now run Freqtrade bot tests directly from the web interface with much le
 
 https://github.com/user-attachments/assets/b376f964-ab70-44ef-b8f6-bc3fd19f4e21
 
+```bash
+npm run build
+kiploks ui --watch
+```
+
+
 - Pick a specific backtest artifact from the list, or run in `Auto (top_n)` mode.
 - Start integration runs from a cleaner Step 4 workspace with collapsible sections.
 - Get report links in run logs after successful local runs, so you can open results right away.
