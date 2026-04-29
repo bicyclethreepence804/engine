@@ -4,12 +4,13 @@
 
 You can now run Freqtrade bot tests directly from the web interface with much less setup friction.
 
+https://github.com/user-attachments/assets/b376f964-ab70-44ef-b8f6-bc3fd19f4e21
+
 - Pick a specific backtest artifact from the list, or run in `Auto (top_n)` mode.
 - Start integration runs from a cleaner Step 4 workspace with collapsible sections.
 - Get report links in run logs after successful local runs, so you can open results right away.
 - Report title handling is automatic and predictable when switching between artifact and `top_n` modes.
 
-https://github.com/user-attachments/assets/b376f964-ab70-44ef-b8f6-bc3fd19f4e21
 
 [![npm](https://img.shields.io/npm/v/@kiploks/engine-core)](https://www.npmjs.com/package/@kiploks/engine-core)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
