@@ -7,8 +7,10 @@ You can now run Freqtrade bot tests directly from the web interface with much le
 https://github.com/user-attachments/assets/b376f964-ab70-44ef-b8f6-bc3fd19f4e21
 
 ```bash
-npm run build
-kiploks ui --watch
+npm install
+npm run ui
+# or without global install:
+npx -y @kiploks/engine-cli ui --watch
 ```
 
 
